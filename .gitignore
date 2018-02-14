@@ -1,0 +1,7 @@
+node_modules/
+.idea/
+.vagrant/
+config.cfg
+npm-debug.log
+static/app.css
+static/app.js
