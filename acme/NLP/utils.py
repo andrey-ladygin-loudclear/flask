@@ -79,3 +79,8 @@ def complete_analogy(word_a, word_b, word_c, word_to_vec_map):
             best_word = w
 
     return best_word
+
+
+def convert_to_one_hot(Y, C):
+    Y = np.eye(C)[Y.reshape(-1)]
+    return Y

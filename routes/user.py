@@ -1,7 +1,7 @@
 from flask import render_template
 from flask import request
 
-from application.auth import is_logged_in
+from acme.auth import is_logged_in
 from app import app
 from models.user import User
 

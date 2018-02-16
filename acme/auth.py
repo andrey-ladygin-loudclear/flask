@@ -1,5 +1,6 @@
 from functools import wraps
 
+from app import app
 from flask import Response
 from flask import flash
 from flask import redirect
@@ -46,11 +47,12 @@ class Auth:
 
         return False
 
+app.add_template_global(Auth, name='Auth')
 
 def is_logged_in(f):
     @wraps(f)
     def wrap(*args, **kwards):
-        if 'logged_in' in session:
+        if Auth.check():
             return f(*args, **kwards)
         else:
             flash('Unauthorized, Please login', 'danger')

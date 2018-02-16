@@ -5,8 +5,8 @@ from flask import request
 from flask import session
 
 from app import app
-from application.auth import Auth
-from application.url import URL
+from acme.auth import Auth
+from acme.url import URL
 from models.recipe import Recipe
 
 

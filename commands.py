@@ -4,7 +4,7 @@ import click
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 
-from application.auth import Auth
+from acme.auth import Auth
 from app import app, db
 
 # Models
