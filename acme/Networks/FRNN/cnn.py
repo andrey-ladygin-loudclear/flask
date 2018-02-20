@@ -117,6 +117,29 @@ def create_conv2d(X, conv_num_outputs, strides, w_name):
     Z = tf.nn.conv2d(X, W, strides=c_strides, padding='SAME', name=w_name+'_conv2d')
     return Z
 
+def create_nn_conv2d(X, W, strides, w_name=''):
+    c_strides = [1, strides[0], strides[1], 1]
+    return tf.nn.conv2d(X, W, strides=c_strides, padding='SAME')
+
+
+def create_weight_variables(shape, seed, name, use_gpu=False):
+    if len(shape) == 4:
+        in_out = shape[0] * shape[1] * shape[2] + shape[3]
+    else:
+        in_out = shape[0] + shape[1]
+
+    import math
+    stddev = math.sqrt(3.0 / in_out) # XAVIER INITIALIZER (GAUSSIAN)
+
+    initializer = tf.truncated_normal(shape, stddev=stddev, seed=seed)
+
+    if use_gpu:
+        with tf.device("/gpu"):
+            return tf.get_variable(name, initializer=initializer, dtype=tf.float32)
+    else:
+        with tf.device("/cpu"):
+            return tf.get_variable(name, initializer=initializer, dtype=tf.float32)
+
 def conv2d_maxpool(x_tensor, conv_num_outputs, conv_ksize, conv_strides, pool_ksize, pool_strides):
     """
     Apply convolution then max pooling to x_tensor
@@ -167,52 +190,56 @@ def output(x_tensor, num_outputs):
 def get_bias(n):
     return tf.Variable(tf.zeros(n))
 
-n=0
-def make_logits(tensor, keep_prob):
-    global n
-    n += 1
-    # Inputs
-    # keep_prob = cnn.neural_net_keep_prob_input()
+W1 = None
+W2 = None
+W3 = None
+W4 = None
 
-    # Model
-    nn = create_conv2d(tensor, 128, strides=[32, 32], w_name='W1'+str(n))
-    nn = tf.nn.relu(nn)
+def init(use_gpu=0):
+    global W1, W2, W3, W4
+
+    shape = get_weight_shape(w=16, h=16, depth=3, out=128)
+    W1 = create_weight_variables(shape, seed=0, name="W_conv1", use_gpu=use_gpu)
+
+    shape = get_weight_shape(w=8, h=8, depth=128, out=256)
+    W2 = create_weight_variables(shape, seed=0, name="W_conv2", use_gpu=use_gpu)
+
+    shape = get_weight_shape(w=4, h=4, depth=256, out=256)
+    W3 = create_weight_variables(shape, seed=0, name="W_conv3", use_gpu=use_gpu)
+
+    shape = get_weight_shape(w=4, h=4, depth=256, out=512)
+    W4 = create_weight_variables(shape, seed=0, name="W_conv4", use_gpu=use_gpu)
+
+def get_weight_shape(w, h, depth, out):
+    return [w, h, depth, out]
+
+def make_logits(tensor, keep_prob):
+
+    with tf.name_scope('conv2d_1') as scope:
+        nn = create_nn_conv2d(tensor, W1, [16, 16])
+    nn = tf.nn.tanh(nn)
     nn = tf.nn.max_pool(nn, ksize=[1,2,2,1], strides=[1,2,2,1], padding='SAME')
 
-    nn = create_conv2d(nn, 256, strides=[16, 16], w_name='W2'+str(n))
-    nn = tf.nn.relu(nn)
+    with tf.name_scope('conv2d_2') as scope:
+        nn = create_nn_conv2d(nn, W2, [8, 8])
+    nn = tf.nn.tanh(nn)
     nn = tf.nn.max_pool(nn, ksize=[1,2,2,1], strides=[1,2,2,1], padding = 'SAME')
 
-    # nn = cnn.create_conv2d(nn, 256, strides=[8, 8], w_name='W3'+str(n))
-    # nn = tf.nn.relu(nn)
-    # nn = tf.nn.max_pool(nn, ksize=[1,2,2,1], strides=[1,2,2,1], padding = 'SAME')
-    #
-    # nn = cnn.create_conv2d(nn, 512, strides=[8, 8], w_name='W4'+str(n))
-    # nn = tf.nn.relu(nn)
-    # nn = tf.nn.max_pool(nn, ksize=[1,2,2,1], strides=[1,2,2,1], padding = 'SAME')
+    with tf.name_scope('conv2d_3') as scope:
+        nn = create_nn_conv2d(nn, W3, [4, 4])
+    nn = tf.nn.tanh(nn)
+    nn = tf.nn.max_pool(nn, ksize=[1,2,2,1], strides=[1,2,2,1], padding = 'SAME')
 
-    # tf.nn.dropout(nn, keep_prob=keep_prob)
-    #
-    # nn = cnn.create_conv2d(nn, 512, strides=[6, 6], w_name='W5'+str(n))
-    # nn = tf.nn.relu(nn)
-    # nn = tf.nn.max_pool(nn, ksize=[1,2,2,1], strides=[1,2,2,1], padding = 'SAME')
-    #
-    # tf.nn.dropout(nn, keep_prob=keep_prob)
-    #
-    # nn = cnn.create_conv2d(nn, 1024, strides=[6, 6], w_name='W6'+str(n))
-    # nn = tf.nn.relu(nn)
-    # nn = tf.nn.max_pool(nn, ksize=[1,2,2,1], strides=[1,2,2,1], padding = 'SAME')
+    with tf.name_scope('conv2d_4') as scope:
+        nn = create_nn_conv2d(nn, W4, [4, 4])
+    nn = tf.nn.tanh(nn)
+    nn = tf.nn.max_pool(nn, ksize=[1,2,2,1], strides=[1,2,2,1], padding = 'SAME')
 
     tf.nn.dropout(nn, keep_prob=keep_prob)
-    #
-    # nn = cnn.create_conv2d(nn, 1024, strides=[3, 3], w_name='W7'+str(n))
-    # nn = tf.nn.relu(nn)
-    # nn = tf.nn.max_pool(nn, ksize=[1,2,2,1], strides=[1,2,2,1], padding = 'SAME')
 
-    layer = tf.contrib.layers.flatten(nn)
-    # layer = tf.contrib.layers.fully_connected(layer, 2048, activation_fn=tf.nn.relu)
+    layer = tf.contrib.layers.fully_connected(nn, 1024, activation_fn=tf.nn.tanh)
     tf.nn.dropout(layer, keep_prob=keep_prob)
-    layer = tf.contrib.layers.fully_connected(layer, 1024, activation_fn=tf.nn.relu)
-    # layer = tf.contrib.layers.fully_connected(layer, 100, activation_fn=tf.nn.relu)
+    layer = tf.contrib.layers.fully_connected(layer, 1024, activation_fn=tf.nn.tanh)
+    tf.nn.dropout(layer, keep_prob=keep_prob)
     layer = tf.contrib.layers.fully_connected(layer, 512, activation_fn=None)
     return layer

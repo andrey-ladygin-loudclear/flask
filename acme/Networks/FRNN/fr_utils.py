@@ -219,13 +219,6 @@ def get_batch_from_peoples(peoples):
             positive = get_positive_sample(somebody, image)
             yield os.path.join(somebody, image), positive, negative
 
-def preprocess_image(image_path, size=(96,96)):
-    im = Image.open(image_path)
-    im = im.resize(size)
-    im = np.array(im).astype(np.float32)
-    im = np.around(im/255.0, decimals=12)
-    return im
-
 def shuffle(x):
     s = np.arange(x.shape[0])
     np.random.shuffle(s)
@@ -250,3 +243,25 @@ def img_to_encoding(image_path, model):
     x_train = np.array([img])
     embedding = model.predict_on_batch(x_train)
     return embedding
+
+def preprocess_images(paths):
+    res = []
+    for path in paths: res.append(preprocess_image(path))
+    return np.array(res)
+
+def preprocess_image(image_path, size=(96,96)):
+    im = Image.open(image_path)
+    im = im.resize(size)
+    im = np.array(im).astype(np.float32)
+    im = np.around(im/255.0, decimals=12)
+    return im
+
+def show_image_path(image_path):
+    im = Image.open(image_path)
+    plt.imshow(im)
+    plt.show()
+
+def show_image(im):
+    image = Image.fromarray(im, 'RGB')
+    plt.imshow(image)
+    plt.show()
