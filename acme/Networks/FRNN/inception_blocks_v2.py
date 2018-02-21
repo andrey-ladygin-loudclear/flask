@@ -1,3 +1,4 @@
+import keras
 import tensorflow as tf
 import numpy as np
 import os
@@ -37,14 +38,17 @@ def inception_block_1a(X):
     X_pool = Conv2D(32, (1, 1), data_format='channels_first', name='inception_3a_pool_conv')(X_pool)
     X_pool = BatchNormalization(axis=1, epsilon=0.00001, name='inception_3a_pool_bn')(X_pool)
     X_pool = Activation('relu')(X_pool)
-    X_pool = ZeroPadding2D(padding=((3, 4), (3, 4)), data_format='channels_first')(X_pool)
+    #X_pool = ZeroPadding2D(padding=((3, 4), (3, 4)), data_format='channels_first')(X_pool)#(?, 32, 12, 102)
+    X_pool = ZeroPadding2D(padding=((3, 4), (42, 55)), data_format='channels_first')(X_pool)#(?, 32, 12, 192)
 
     X_1x1 = Conv2D(64, (1, 1), data_format='channels_first', name='inception_3a_1x1_conv')(X)
     X_1x1 = BatchNormalization(axis=1, epsilon=0.00001, name='inception_3a_1x1_bn')(X_1x1)
     X_1x1 = Activation('relu')(X_1x1)
 
     # CONCAT
+    #[(None, 32, 12, 192), (None, 32, 12, 192), (None, 32, 12, 102), (None, 32, 12, 192)]
     inception = concatenate([X_3x3, X_5x5, X_pool, X_1x1], axis=1)
+    #inception = keras.layers.merge([X_3x3, X_5x5, X_pool, X_1x1], mode='concat', concat_axis=0, dot_axes=1)
 
     return inception
 
@@ -69,7 +73,8 @@ def inception_block_1b(X):
     X_pool = Conv2D(64, (1, 1), data_format='channels_first', name='inception_3b_pool_conv')(X_pool)
     X_pool = BatchNormalization(axis=1, epsilon=0.00001, name='inception_3b_pool_bn')(X_pool)
     X_pool = Activation('relu')(X_pool)
-    X_pool = ZeroPadding2D(padding=(4, 4), data_format='channels_first')(X_pool)
+    #X_pool = ZeroPadding2D(padding=(4, 4), data_format='channels_first')(X_pool)#(?, 64, 12, 72)
+    X_pool = ZeroPadding2D(padding=((4, 64)), data_format='channels_first')(X_pool)#(?, 64, 12, 192)
 
     X_1x1 = Conv2D(64, (1, 1), data_format='channels_first', name='inception_3b_1x1_conv')(X)
     X_1x1 = BatchNormalization(axis=1, epsilon=0.00001, name='inception_3b_1x1_bn')(X_1x1)
@@ -122,8 +127,9 @@ def inception_block_2a(X):
                                cv2_filter=(5, 5),
                                cv2_strides=(1, 1),
                                padding=(2, 2))
+#[(None, 192, 6, 96), (None, 64, 6, 96), (None, 128, 6, 36), (None, 256, 6, 96)]
+    X_pool = AveragePooling2D(pool_size=(3, 5), strides=(3, 1), data_format='channels_first')(X)
 
-    X_pool = AveragePooling2D(pool_size=(3, 3), strides=(3, 3), data_format='channels_first')(X)
     X_pool = fr_utils.conv2d_bn(X_pool,
                                 layer='inception_4a_pool',
                                 cv1_out=128,
@@ -172,7 +178,7 @@ def inception_block_3a(X):
                                cv2_filter=(3, 3),
                                cv2_strides=(1, 1),
                                padding=(1, 1))
-    X_pool = AveragePooling2D(pool_size=(3, 3), strides=(3, 3), data_format='channels_first')(X)
+    X_pool = AveragePooling2D(pool_size=(3, 3), strides=(3, 1), data_format='channels_first')(X)
     X_pool = fr_utils.conv2d_bn(X_pool,
                                 layer='inception_5a_pool',
                                 cv1_out=96,
@@ -196,7 +202,7 @@ def inception_block_3b(X):
                                cv2_filter=(3, 3),
                                cv2_strides=(1, 1),
                                padding=(1, 1))
-    X_pool = MaxPooling2D(pool_size=3, strides=2, data_format='channels_first')(X)
+    X_pool = MaxPooling2D(pool_size=3, strides=1, data_format='channels_first')(X)
     X_pool = fr_utils.conv2d_bn(X_pool,
                                 layer='inception_5b_pool',
                                 cv1_out=96,

@@ -12,8 +12,8 @@ import numpy as np
 import h5py
 
 from acme.Networks.FRNN.vgg import vgg_face
-#dir = '/home/srivoknovskiy/deepnets/lfw'
-dir = 'E:\dataset\lfw'
+dir = '/home/srivoknovskiy/deepnets/lfw'
+#dir = dir + ''
 peoples = list_dir(dir)
 
 dataset = []
@@ -27,6 +27,10 @@ for i,p,n in get_batch_from_peoples(peoples):
     negative = os.path.join(dir, n)
     dataset.append([anchor, positive, negative])
 
+# dataset = np.array(dataset)
+# print(dataset, dataset.shape)
+# raise EOFError
+
 dataset = shuffle(np.array(dataset))
 
 
@@ -35,7 +39,7 @@ config.gpu_options.allocator_type = 'BFC'
 
 n_classes = 1
 epochs = 100
-batch_size = 256
+batch_size = 100
 keep_probability = 0.5
 learning_rate = 0.001
 
@@ -49,14 +53,14 @@ keep_prob = cnn.neural_net_keep_prob_input()
 
 cnn.init()
 
-anchor = cnn.make_logits(anchor_image, keep_prob)
+anchor = cnn.make_logits(anchor_image, keep_prob, reuse=False)
 positive = cnn.make_logits(positive_image, keep_prob)
 negative = cnn.make_logits(negative_image, keep_prob)
 
 #loss = triplet_loss([anchor, positive, negative], alpha=5)
-# loss = triplet_loss([anchor, positive, negative], alpha=0.5)
-loss, positives, negatives = compute_triplet_loss(anchor, positive, negative, margin=0.01)
-# optimizer = tf.train.AdamOptimizer().minimize(loss)
+loss, positives, negatives = triplet_loss([anchor, positive, negative])
+#loss, positives, negatives = compute_triplet_loss(anchor, positive, negative, margin=0.01)
+#optimizer = tf.train.AdamOptimizer().minimize(loss)
 optimizer = tf.train.GradientDescentOptimizer(learning_rate=learning_rate).minimize(loss)
 
 
@@ -65,26 +69,29 @@ print('Total count of dataset', len(dataset))
 print('Training...')
 
 def check_predictions():
-    im1 = preprocess_image('E:\dataset\lfw\Abid_Hamid_Mahmud_Al-Tikriti\Abid_Hamid_Mahmud_Al-Tikriti_0001.jpg')
-    im2 = preprocess_image('E:\dataset\lfw\Abid_Hamid_Mahmud_Al-Tikriti\Abid_Hamid_Mahmud_Al-Tikriti_0001.jpg')
-    print('Same: ', check(im1, im2))
+    im1 = preprocess_image(dir + '/Angelina_Jolie/Angelina_Jolie_0004.jpg')
+    im2 = preprocess_image(dir + '/Angelina_Jolie/Angelina_Jolie_0007.jpg')
+    print('On Trained photo: ', check(im1, im2))
 
-    im1 = preprocess_image('E:\dataset\lfw\Abid_Hamid_Mahmud_Al-Tikriti\Abid_Hamid_Mahmud_Al-Tikriti_0001.jpg')
-    im2 = preprocess_image('E:\dataset\lfw\Abid_Hamid_Mahmud_Al-Tikriti\Abid_Hamid_Mahmud_Al-Tikriti_0002.jpg')
-    print('1-2: ', check(im1, im2))
+    im1 = preprocess_image(dir + '/Abid_Hamid_Mahmud_Al-Tikriti/Abid_Hamid_Mahmud_Al-Tikriti_0001.jpg')
+    im2 = preprocess_image(dir + '/Abid_Hamid_Mahmud_Al-Tikriti/Abid_Hamid_Mahmud_Al-Tikriti_0001.jpg')
+    print('Same photo: ', check(im1, im2))
 
-    im1 = preprocess_image('E:\dataset\lfw\Abid_Hamid_Mahmud_Al-Tikriti\Abid_Hamid_Mahmud_Al-Tikriti_0001.jpg')
-    im2 = preprocess_image('E:\dataset\lfw\Abid_Hamid_Mahmud_Al-Tikriti\Abid_Hamid_Mahmud_Al-Tikriti_0003.jpg')
-    print('1-3: ', check(im1, im2))
+    im1 = preprocess_image(dir + '/Abid_Hamid_Mahmud_Al-Tikriti/Abid_Hamid_Mahmud_Al-Tikriti_0001.jpg')
+    im2 = preprocess_image(dir + '/Abid_Hamid_Mahmud_Al-Tikriti/Abid_Hamid_Mahmud_Al-Tikriti_0002.jpg')
+    print('Same person 1-2: ', check(im1, im2))
 
-    im1 = preprocess_image('E:\dataset\lfw\Abid_Hamid_Mahmud_Al-Tikriti\Abid_Hamid_Mahmud_Al-Tikriti_0001.jpg')
-    im2 = preprocess_image('E:\dataset\lfw\Adolfo_Aguilar_Zinser\Adolfo_Aguilar_Zinser_0001.jpg')
-    print('bid_Hamid_Mahmud_Al-olfo_Aguilar_Zinser 1x1: ', check(im1, im2))
+    im1 = preprocess_image(dir + '/Abid_Hamid_Mahmud_Al-Tikriti/Abid_Hamid_Mahmud_Al-Tikriti_0001.jpg')
+    im2 = preprocess_image(dir + '/Abid_Hamid_Mahmud_Al-Tikriti/Abid_Hamid_Mahmud_Al-Tikriti_0003.jpg')
+    print('Same person 1-3: ', check(im1, im2))
 
-    im1 = preprocess_image('E:\dataset\lfw\Abid_Hamid_Mahmud_Al-Tikriti\Abid_Hamid_Mahmud_Al-Tikriti_0002.jpg')
-    im2 = preprocess_image('E:\dataset\lfw\Adolfo_Aguilar_Zinser\Adolfo_Aguilar_Zinser_0002.jpg')
-    print('bid_Hamid_Mahmud_Al-olfo_Aguilar_Zinser 2x2: ', check(im1, im2))
+    im1 = preprocess_image(dir + '/Abid_Hamid_Mahmud_Al-Tikriti/Abid_Hamid_Mahmud_Al-Tikriti_0001.jpg')
+    im2 = preprocess_image(dir + '/Adolfo_Aguilar_Zinser/Adolfo_Aguilar_Zinser_0001.jpg')
+    print('Different persons 1-1: ', check(im1, im2))
 
+    im1 = preprocess_image(dir + '/Abid_Hamid_Mahmud_Al-Tikriti/Abid_Hamid_Mahmud_Al-Tikriti_0002.jpg')
+    im2 = preprocess_image(dir + '/Adolfo_Aguilar_Zinser/Adolfo_Aguilar_Zinser_0002.jpg')
+    print('Different persons 2-2', check(im1, im2))
 
 
 def check(im1, im2):
@@ -93,14 +100,15 @@ def check(im1, im2):
     dist = np.linalg.norm(encodec1 - encodec2)
     return dist
 
+
 with tf.Session() as sess:
     # Initializing the variables
 
-    tf.summary.scalar('loss', loss)
-    tf.summary.scalar('positives', positives)
-    tf.summary.scalar('negatives', negatives)
-    tf.summary.scalar('lr', learning_rate)
-    merged = tf.summary.merge_all()
+    # tf.summary.scalar('loss', loss)
+    # tf.summary.scalar('positives', positives)
+    # tf.summary.scalar('negatives', negatives)
+    # tf.summary.scalar('lr', learning_rate)
+    # merged = tf.summary.merge_all()
     # tf.initialize_all_variables().run()
     sess.run(tf.global_variables_initializer())
 
@@ -118,11 +126,11 @@ with tf.Session() as sess:
             # print('pos_images', pos_images[0])
             # print('neg_images', neg_images[0])
 
-            anc_images = preprocess_images(anc_images)
-            pos_images = preprocess_images(pos_images)
-            neg_images = preprocess_images(neg_images)
+            anc_images = preprocess_images(anc_images, size=(imw, imh))
+            pos_images = preprocess_images(pos_images, size=(imw, imh))
+            neg_images = preprocess_images(neg_images, size=(imw, imh))
 
-            _, cost, m, p, n = sess.run([optimizer, loss, merged, positives, negatives], feed_dict={
+            _, cost, p, n = sess.run([optimizer, loss, positives, negatives], feed_dict={
                 anchor_image: anc_images,
                 positive_image: pos_images,
                 negative_image: neg_images,
@@ -134,10 +142,10 @@ with tf.Session() as sess:
             #check_predictions()
 
 
-        print("")
-        print('Epoch {:>2}, Batch:  '.format(epoch + 1), end='')
-        print('Cost: ', (cost_sum / batches_count), end=' ')
+        #print("")
+        #print('Epoch {:>2}, Batch:  '.format(epoch + 1), end='')
+        #print('Cost: ', (cost_sum / batches_count), end=' ')
 
-        if cost_sum == 0:
-            print('Cost is minimized. Break')
-            break
+        # if cost_sum == 0:
+        #     print('Cost is minimized. Break')
+        #     break

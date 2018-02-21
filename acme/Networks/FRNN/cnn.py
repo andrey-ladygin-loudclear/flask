@@ -140,6 +140,16 @@ def create_weight_variables(shape, seed, name, use_gpu=False):
         with tf.device("/cpu"):
             return tf.get_variable(name, initializer=initializer, dtype=tf.float32)
 
+def create_bias_variables(shape, name, use_gpu=False):
+    initializer = tf.constant(0.1, shape=shape)
+
+    if use_gpu:
+        with tf.device("/gpu"):
+            return tf.get_variable(name, initializer=initializer, dtype=tf.float32)
+    else:
+        with tf.device("/cpu"):
+            return tf.get_variable(name, initializer=initializer, dtype=tf.float32)
+
 def conv2d_maxpool(x_tensor, conv_num_outputs, conv_ksize, conv_strides, pool_ksize, pool_strides):
     """
     Apply convolution then max pooling to x_tensor
@@ -194,52 +204,122 @@ W1 = None
 W2 = None
 W3 = None
 W4 = None
+b1 = None
+b2 = None
+b3 = None
+b4 = None
 
 def init(use_gpu=0):
-    global W1, W2, W3, W4
+    global W1, W2, W3, W4, b1, b2, b3, b4
 
-    shape = get_weight_shape(w=16, h=16, depth=3, out=128)
-    W1 = create_weight_variables(shape, seed=0, name="W_conv1", use_gpu=use_gpu)
+    with tf.variable_scope('weights') as scope:
+        shape = get_weight_shape(w=16, h=16, depth=3, out=128)
+        W1 = create_weight_variables(shape, seed=0, name="W_conv1", use_gpu=use_gpu)
+        b1 = create_bias_variables([128], name="b_conv1", use_gpu=use_gpu)
 
-    shape = get_weight_shape(w=8, h=8, depth=128, out=256)
-    W2 = create_weight_variables(shape, seed=0, name="W_conv2", use_gpu=use_gpu)
+        shape = get_weight_shape(w=8, h=8, depth=128, out=256)
+        W2 = create_weight_variables(shape, seed=0, name="W_conv2", use_gpu=use_gpu)
+        b2 = create_bias_variables([256], name="b_conv2", use_gpu=use_gpu)
 
-    shape = get_weight_shape(w=4, h=4, depth=256, out=256)
-    W3 = create_weight_variables(shape, seed=0, name="W_conv3", use_gpu=use_gpu)
+        shape = get_weight_shape(w=4, h=4, depth=256, out=256)
+        W3 = create_weight_variables(shape, seed=0, name="W_conv3", use_gpu=use_gpu)
+        b3 = create_bias_variables([256], name="b_conv3", use_gpu=use_gpu)
 
-    shape = get_weight_shape(w=4, h=4, depth=256, out=512)
-    W4 = create_weight_variables(shape, seed=0, name="W_conv4", use_gpu=use_gpu)
+        shape = get_weight_shape(w=4, h=4, depth=256, out=512)
+        W4 = create_weight_variables(shape, seed=0, name="W_conv4", use_gpu=use_gpu)
+        b4 = create_bias_variables([512], name="b_conv4", use_gpu=use_gpu)
 
 def get_weight_shape(w, h, depth, out):
     return [w, h, depth, out]
 
-def make_logits(tensor, keep_prob):
+def make_logits(tensor, keep_prob, reuse=True):
+
+    with tf.variable_scope("weights", reuse=True): W1 = tf.get_variable("W_conv1")
+    with tf.variable_scope("weights", reuse=True): W2 = tf.get_variable("W_conv2")
+    with tf.variable_scope("weights", reuse=True): W3 = tf.get_variable("W_conv3")
+    with tf.variable_scope("weights", reuse=True): W4 = tf.get_variable("W_conv4")
+
+    with tf.variable_scope("weights", reuse=True): b1 = tf.get_variable("b_conv1")
+    with tf.variable_scope("weights", reuse=True): b2 = tf.get_variable("b_conv2")
+    with tf.variable_scope("weights", reuse=True): b3 = tf.get_variable("b_conv3")
+    with tf.variable_scope("weights", reuse=True): b4 = tf.get_variable("b_conv4")
 
     with tf.name_scope('conv2d_1') as scope:
         nn = create_nn_conv2d(tensor, W1, [16, 16])
-    nn = tf.nn.tanh(nn)
+    nn = tf.nn.tanh(tf.nn.bias_add(nn, b1))
+    nn = tf.layers.batch_normalization(nn)
     nn = tf.nn.max_pool(nn, ksize=[1,2,2,1], strides=[1,2,2,1], padding='SAME')
 
     with tf.name_scope('conv2d_2') as scope:
         nn = create_nn_conv2d(nn, W2, [8, 8])
-    nn = tf.nn.tanh(nn)
+    nn = tf.nn.tanh(tf.nn.bias_add(nn, b2))
+    nn = tf.layers.batch_normalization(nn)
     nn = tf.nn.max_pool(nn, ksize=[1,2,2,1], strides=[1,2,2,1], padding = 'SAME')
 
     with tf.name_scope('conv2d_3') as scope:
         nn = create_nn_conv2d(nn, W3, [4, 4])
-    nn = tf.nn.tanh(nn)
+    nn = tf.nn.tanh(tf.nn.bias_add(nn, b3))
+    nn = tf.layers.batch_normalization(nn)
     nn = tf.nn.max_pool(nn, ksize=[1,2,2,1], strides=[1,2,2,1], padding = 'SAME')
 
     with tf.name_scope('conv2d_4') as scope:
         nn = create_nn_conv2d(nn, W4, [4, 4])
-    nn = tf.nn.tanh(nn)
+    nn = tf.nn.tanh(tf.nn.bias_add(nn, b4))
+    nn = tf.layers.batch_normalization(nn)
     nn = tf.nn.max_pool(nn, ksize=[1,2,2,1], strides=[1,2,2,1], padding = 'SAME')
 
     tf.nn.dropout(nn, keep_prob=keep_prob)
 
-    layer = tf.contrib.layers.fully_connected(nn, 1024, activation_fn=tf.nn.tanh)
-    tf.nn.dropout(layer, keep_prob=keep_prob)
-    layer = tf.contrib.layers.fully_connected(layer, 1024, activation_fn=tf.nn.tanh)
-    tf.nn.dropout(layer, keep_prob=keep_prob)
-    layer = tf.contrib.layers.fully_connected(layer, 512, activation_fn=None)
+    layer = tf.contrib.layers.fully_connected(nn, 1024, activation_fn=None, scope='Bottleneck', reuse=reuse)
+    #tf.nn.dropout(layer, keep_prob=keep_prob)
+    #layer = tf.contrib.layers.fully_connected(layer, 1024, activation_fn=tf.nn.tanh)
+    #tf.nn.dropout(layer, keep_prob=keep_prob)
+    #layer = tf.contrib.layers.fully_connected(layer, 512, activation_fn=None)
     return layer
+
+
+
+class ConvolutionalBatchNormalizer(object):
+    """Helper class that groups the normalization logic and variables.
+
+    Use:
+        ewma = tf.train.ExponentialMovingAverage(decay=0.99)
+        bn = ConvolutionalBatchNormalizer(depth, 0.001, ewma, True)
+        update_assignments = bn.get_assigner()
+        x = bn.normalize(y, train=training?)
+        (the output x will be batch-normalized).
+    """
+
+    def __init__(self, depth, epsilon, ewma_trainer, scale_after_norm):
+        self.mean = tf.Variable(tf.constant(0.0, shape=[depth]),
+                                trainable=False)
+        self.variance = tf.Variable(tf.constant(1.0, shape=[depth]),
+                                    trainable=False)
+        self.beta = tf.Variable(tf.constant(0.0, shape=[depth]))
+        self.gamma = tf.Variable(tf.constant(1.0, shape=[depth]))
+        self.ewma_trainer = ewma_trainer
+        self.epsilon = epsilon
+        self.scale_after_norm = scale_after_norm
+
+    def get_assigner(self):
+        """Returns an EWMA apply op that must be invoked after optimization."""
+        return self.ewma_trainer.apply([self.mean, self.variance])
+
+    def normalize(self, x, train=True):
+        """Returns a batch-normalized version of x."""
+        if train:
+            mean, variance = tf.nn.moments(x, [0, 1, 2])
+            assign_mean = self.mean.assign(mean)
+            assign_variance = self.variance.assign(variance)
+            with tf.control_dependencies([assign_mean, assign_variance]):
+                return tf.nn.batch_norm_with_global_normalization(
+                    x, mean, variance, self.beta, self.gamma,
+                    self.epsilon, self.scale_after_norm)
+        else:
+            mean = self.ewma_trainer.average(self.mean)
+            variance = self.ewma_trainer.average(self.variance)
+            local_beta = tf.identity(self.beta)
+            local_gamma = tf.identity(self.gamma)
+            return tf.nn.batch_norm_with_global_normalization(
+                x, mean, variance, local_beta, local_gamma,
+                self.epsilon, self.scale_after_norm)

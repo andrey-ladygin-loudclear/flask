@@ -191,12 +191,17 @@ def load_dataset():
 
 def list_dir(path):
     dict = {}
+    count_of_images = 10
+    count_of_peoples = 10
 
     for folder in os.listdir(path):
         images = os.listdir(os.path.join(path, folder))
 
-        if len(images) > 8:
-            dict[folder] = images
+        if len(images) > 10:
+            count_of_peoples -= 1
+            dict[folder] = images[:count_of_images]
+
+        if not count_of_peoples: break
 
     return dict
 
@@ -244,9 +249,9 @@ def img_to_encoding(image_path, model):
     embedding = model.predict_on_batch(x_train)
     return embedding
 
-def preprocess_images(paths):
+def preprocess_images(paths, size=(96,96)):
     res = []
-    for path in paths: res.append(preprocess_image(path))
+    for path in paths: res.append(preprocess_image(path, size=size))
     return np.array(res)
 
 def preprocess_image(image_path, size=(96,96)):
