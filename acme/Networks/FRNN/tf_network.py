@@ -12,7 +12,8 @@ import numpy as np
 import h5py
 
 from acme.Networks.FRNN.vgg import vgg_face
-dir = '/home/srivoknovskiy/deepnets/lfw'
+#dir = '/home/srivoknovskiy/deepnets/lfw'
+dir = 'E:\dataset\lfw/'
 #dir = dir + ''
 peoples = list_dir(dir)
 

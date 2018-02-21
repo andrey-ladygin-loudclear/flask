@@ -271,6 +271,7 @@ def make_logits(tensor, keep_prob, reuse=True):
     tf.nn.dropout(nn, keep_prob=keep_prob)
 
     layer = tf.contrib.layers.fully_connected(nn, 1024, activation_fn=None, scope='Bottleneck', reuse=reuse)
+    #layer = tf.contrib.nn.fully_connected(nn, 1024, activation_fn=tf.nn.sigmoid, scope = 'fc1')
     #tf.nn.dropout(layer, keep_prob=keep_prob)
     #layer = tf.contrib.layers.fully_connected(layer, 1024, activation_fn=tf.nn.tanh)
     #tf.nn.dropout(layer, keep_prob=keep_prob)
