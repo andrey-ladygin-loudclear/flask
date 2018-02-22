@@ -2,6 +2,7 @@ import os
 import random
 import tensorflow as tf
 import numpy as np
+from PIL import Image
 
 
 def list_dir(path, count_of_images=10, count_of_peoples=10):
@@ -48,12 +49,29 @@ def get_batch_from_peoples(peoples):
 def triplet_loss(y_pred, alpha = 0.2):
     anchor, positive, negative = y_pred[0], y_pred[1], y_pred[2]
 
+    # a = np.array([0, 2.3, 0, 1.5, 6, 0, 0, 1])
+    # p = np.array([2, 0, 1.2, 0.5, 3.2, 0, 2, 0])
+    # n = np.array([1, 1.3, 2, 3, 2, 0, 3, 0])
+    #
+    # print('sub a-p', (a-p))
+    # print('sub a-n', (a-n))
+    #
+    # pd = np.sum(np.square(a-p))
+    # nd = np.sum(np.square(a-n))
+    #
+    # print('sub a-p', pd)
+    # print('sub a-n', nd)
+    # print('basic', pd-nd)
+    #
+    # # print(tf.subtract(anchor, positive))
+    # raise EnvironmentError
+    ttt = [tf.reduce_sum(anchor), tf.reduce_sum(positive), tf.reduce_sum(negative)]
     pos_dist = tf.reduce_sum(tf.square(tf.subtract(anchor, positive)))
     neg_dist = tf.reduce_sum(tf.square(tf.subtract(anchor, negative)))
     basic_loss = tf.add(tf.subtract(pos_dist, neg_dist), alpha)
     loss = tf.maximum(tf.reduce_mean(basic_loss), 0.0)
 
-    return loss, pos_dist, neg_dist
+    return loss, pos_dist, neg_dist, ttt
 
 
 def triplet_loss2(y_pred, alpha = 0.2):
@@ -85,16 +103,6 @@ def compute_triplet_loss(y_pred, margin=0.2):
      Return the loss operation
     """
     anchor_feature, positive_feature, negative_feature = y_pred
-
-    print("anchor_feature")
-    print(anchor_feature)
-    print("positive_feature")
-    print(positive_feature)
-    print("negative_feature")
-    print(negative_feature)
-
-    print([x.name for x in tf.global_variables()])
-    raise EOFError
 
     with tf.name_scope("triplet_loss"):
         d_p_squared = tf.square(compute_euclidean_distance(anchor_feature, positive_feature))
@@ -131,7 +139,16 @@ def batch_data(data, batch_size):
         end = min(start + batch_size, len(data))
         yield data[start:end]
 
+
 def shuffle(x):
     s = np.arange(x.shape[0])
     np.random.shuffle(s)
     return x[s]
+
+
+def preprocess_image(image_path, size=(96,96)):
+    im = Image.open(image_path)
+    im = im.resize(size)
+    im = np.array(im).astype(np.float32)
+    im = np.around(im/255.0, decimals=12)
+    return im
