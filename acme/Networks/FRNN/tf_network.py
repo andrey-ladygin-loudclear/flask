@@ -12,8 +12,8 @@ import numpy as np
 import h5py
 
 from acme.Networks.FRNN.vgg import vgg_face
-#dir = '/home/srivoknovskiy/deepnets/lfw'
-dir = 'E:\dataset\lfw/'
+dir = '/home/srivoknovskiy/deepnets/lfw'
+# dir = 'E:\dataset\lfw/'
 #dir = dir + ''
 peoples = list_dir(dir)
 
@@ -40,7 +40,7 @@ config.gpu_options.allocator_type = 'BFC'
 
 n_classes = 1
 epochs = 100
-batch_size = 100
+batch_size = 10
 keep_probability = 0.5
 learning_rate = 0.001
 
@@ -54,15 +54,15 @@ keep_prob = cnn.neural_net_keep_prob_input()
 
 cnn.init()
 
-anchor = cnn.make_logits(anchor_image, keep_prob, reuse=False)
-positive = cnn.make_logits(positive_image, keep_prob)
-negative = cnn.make_logits(negative_image, keep_prob)
+anchor = cnn.make_logits2(anchor_image, keep_prob, reuse=False)
+positive = cnn.make_logits2(positive_image, keep_prob)
+negative = cnn.make_logits2(negative_image, keep_prob)
 
 #loss = triplet_loss([anchor, positive, negative], alpha=5)
 loss, positives, negatives = triplet_loss([anchor, positive, negative])
 #loss, positives, negatives = compute_triplet_loss(anchor, positive, negative, margin=0.01)
-#optimizer = tf.train.AdamOptimizer().minimize(loss)
-optimizer = tf.train.GradientDescentOptimizer(learning_rate=learning_rate).minimize(loss)
+optimizer = tf.train.AdamOptimizer().minimize(loss)
+# optimizer = tf.train.GradientDescentOptimizer(learning_rate=learning_rate).minimize(loss)
 
 
 

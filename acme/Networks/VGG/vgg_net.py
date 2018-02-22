@@ -52,7 +52,7 @@ if not isdir(dataset_folder_path):
         tar.extractall()
         tar.close()
 
-
+raise EOFError
 import os
 
 import numpy as np
