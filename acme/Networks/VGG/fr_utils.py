@@ -46,29 +46,17 @@ def get_batch_from_peoples(peoples):
 
 
 
-def triplet_loss(y_pred, alpha = 0.2):
+def triplet_loss(y_pred, alpha = 0.2, bloss = 10):
     anchor, positive, negative = y_pred[0], y_pred[1], y_pred[2]
 
-    # a = np.array([0, 2.3, 0, 1.5, 6, 0, 0, 1])
-    # p = np.array([2, 0, 1.2, 0.5, 3.2, 0, 2, 0])
-    # n = np.array([1, 1.3, 2, 3, 2, 0, 3, 0])
-    #
-    # print('sub a-p', (a-p))
-    # print('sub a-n', (a-n))
-    #
-    # pd = np.sum(np.square(a-p))
-    # nd = np.sum(np.square(a-n))
-    #
-    # print('sub a-p', pd)
-    # print('sub a-n', nd)
-    # print('basic', pd-nd)
-    #
-    # # print(tf.subtract(anchor, positive))
-    # raise EnvironmentError
     ttt = [tf.reduce_sum(anchor), tf.reduce_sum(positive), tf.reduce_sum(negative)]
+    #dist = [np.linalg.norm(anchor - positive), np.linalg.norm(anchor - negative)]
+
     pos_dist = tf.reduce_sum(tf.square(tf.subtract(anchor, positive)))
     neg_dist = tf.reduce_sum(tf.square(tf.subtract(anchor, negative)))
     basic_loss = tf.add(tf.subtract(pos_dist, neg_dist), alpha)
+
+    #k = tf.sqrt(tf.abs(tf.reduce_mean(pos_dist)))
     loss = tf.maximum(tf.reduce_mean(basic_loss), 0.0)
 
     return loss, pos_dist, neg_dist, ttt
