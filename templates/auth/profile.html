@@ -1,0 +1,52 @@
+{% extends 'layout.html' %}
+{% block body %}
+<div class="starter-template profile">
+    <h1>{{user.first_name}} {{user.last_name}}</h1>
+    <div class="row">
+        <form class="col-md-6">
+            <div class="form-group">
+                <label for="first_name">First name</label>
+                <input type="text" class="form-control" id="first_name" placeholder="First Name" value="{{user.first_name}}">
+            </div>
+            <div class="form-group">
+                <label for="last_name">Last name</label>
+                <input type="text" class="form-control" id="last_name" placeholder="Last Name" value="{{user.last_name}}">
+            </div>
+            <div class="form-group">
+                <label for="email">Email address</label>
+                <input type="email" class="form-control" id="email" placeholder="Email" value="{{user.email}}">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" id="password" placeholder="Password">
+            </div>
+            <div class="form-group">
+                <label for="confirm_password">Confirm Password</label>
+                <input type="password" class="form-control" id="confirm_password" placeholder="Password">
+            </div>
+            <button type="submit" class="btn btn-default">Submit</button>
+        </form>
+        <div class="col-md-6">
+            <h2>Profile Images</h2>
+            <div class="form-group">
+                <label for="profile_image">Add Profile Image</label>
+                <input type="file" id="profile_image">
+                <div id="my_camera"></div>
+                <input type=button value="Take Snapshot" id="take_snapshot">
+                <p class="help-block">Add your images for face auth</p>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">User images</h3>
+                </div>
+                <div class="panel-body profile-images">
+                    {% for image in user.profile_images %}
+                        <img src="{{ user.get_resource(image.src, static=True) }}" class="img-thumbnail" width="100">
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock body %}

@@ -9,8 +9,8 @@ from acme.Networks.VGG.tensorflow_vgg import vgg16
 from acme.Networks.VGG.tensorflow_vgg import utils
 
 vgg_dir = 'tensorflow_vgg/'
-faces_codes_file = 'faces_codes'
-faces_labels_file = 'faces_labels'
+faces_codes_file = 'faces_codes_2'
+faces_labels_file = 'faces_labels_2'
 
 import os
 
@@ -21,8 +21,8 @@ imw = 96
 imh = 96
 batch_size = 32
 
-dir = '/home/srivoknovskiy/deepnets/lfw/'
-#dir = 'E:\dataset\lfw/'
+# dir = '/home/srivoknovskiy/deepnets/lfw/'
+dir = 'E:\dataset\lfw/'
 peoples = list_dir(dir, count_of_images=None, count_of_peoples=None)
 
 def train_nn():
@@ -50,7 +50,7 @@ def train_nn():
 
     tf.reset_default_graph()
     learning_rate = 0.001
-    epochs = 20
+    epochs = 40
     iteration = 0
 
     fcc_graph = tf.Graph()
@@ -96,8 +96,8 @@ def train_nn():
 
             #loss, positive_dist, negative_dist = compute_triplet_loss([anchor, positive, negative])
             loss, positive_dist, negative_dist, ttt = triplet_loss([anchor, positive, negative], alpha=10)
-            #optimizer = tf.train.AdamOptimizer().minimize(cost)
-            optimizer = tf.train.GradientDescentOptimizer(learning_rate=learning_rate).minimize(loss)
+            optimizer = tf.train.AdamOptimizer().minimize(loss)
+            #optimizer = tf.train.GradientDescentOptimizer(learning_rate=learning_rate).minimize(loss)
 
             fcc_session.run(tf.global_variables_initializer())
 
@@ -123,7 +123,7 @@ def train_nn():
                     )
                     iteration += 1
 
-                    if iteration % 200 == 0:
+                    if iteration % 500 == 0:
                         check_predictions()
                     print('')
 
@@ -198,8 +198,8 @@ def get_codes_and_labels():
 
 def build_fully_connected_layers(tensor, reuse=False):
     with tf.variable_scope('fc_layers', reuse=reuse) as scope:
-        tensor = tf.contrib.layers.fully_connected(tensor, 2048, scope = 'fc1', activation_fn=tf.nn.tanh)
-        tensor = tf.contrib.layers.fully_connected(tensor, 1024, scope = 'fc2', activation_fn=None)
+        tensor = tf.contrib.layers.fully_connected(tensor, 1024, scope = 'fc1', activation_fn=tf.nn.tanh)
+        tensor = tf.contrib.layers.fully_connected(tensor, 128, scope = 'fc2', activation_fn=None)
     return tensor
 
 
