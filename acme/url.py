@@ -1,6 +1,8 @@
 from flask import request
 from flask import session
 
+from app import APP_STATIC, APP_URL, APP_PATH
+
 
 class URL:
     @staticmethod
@@ -20,3 +22,10 @@ class URL:
             return request.referrer or '/'
 
         return return_url
+
+
+def static(path):
+    return path.replace(APP_PATH, APP_URL, path)
+
+def resource(path):
+    return path.replace(APP_STATIC, APP_URL, path)

@@ -1,8 +1,10 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from os.path import abspath, dirname
+from os.path import abspath, dirname, join
 
 APP_PATH = dirname(abspath(__file__))
+APP_STATIC = join(APP_PATH, 'static')
+APP_URL = '/'
 
 app = Flask(__name__)
 app.secret_key = 'OUGAWD8T2yi3e2l39W^&*(D(%'
