@@ -5,7 +5,7 @@ from flask import Response
 from flask import flash
 from flask import redirect
 from flask import session
-from flask import url_for
+from flask import url_for, g
 from passlib.handlers.sha2_crypt import sha256_crypt
 
 from models.user import User

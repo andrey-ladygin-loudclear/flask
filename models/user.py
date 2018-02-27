@@ -23,6 +23,12 @@ class User(db.Model):
     recipes = db.relationship('Recipe', backref='author', lazy='dynamic')
     profile_images = db.relationship('ProfileImages', lazy='dynamic')
 
+    def __eq__(self, other):
+        return type(self) is type(other) and self.id == other.id
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
 
 class ProfileImages(db.Model):
     id = db.Column(db.Integer, primary_key=True)

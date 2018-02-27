@@ -7,7 +7,8 @@ import time
 
 import cv2
 
-from acme.Networks.FaceNet.align_dlib import AlignDlib
+#from acme.Networks.FaceNet.align_dlib import AlignDlib
+from align_dlib import AlignDlib
 
 logger = logging.getLogger(__name__)
 
