@@ -1,2 +1,5 @@
 SQLALCHEMY_DATABASE_URI='mysql://username:password@localhost/databasename'
 SQLALCHEMY_TRACK_MODIFICATIONS=True
+FACE_NET_LANDMARKS='acme/Networks/FaceNet/shape_predictor_68_face_landmarks.dat'
+FACE_NET_OUTPUT='acme/Networks/FaceNet/output'
+FACE_NET_DATA='acme/Networks/FaceNet/data'

@@ -1,5 +1,6 @@
 from flask import request
 from flask import session
+from os.path import join
 
 from app import APP_STATIC, APP_URL, APP_PATH
 
@@ -29,3 +30,6 @@ def static(path):
 
 def resource(path):
     return path.replace(APP_STATIC, APP_URL, path)
+
+def absolute(path):
+    return join(APP_PATH, path)

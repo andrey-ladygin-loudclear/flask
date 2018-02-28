@@ -1,4 +1,5 @@
 require('./bootstrap');
+require('./face_net');
 let Webcam = require('./webcam.min');
 
 
@@ -15,19 +16,10 @@ if ($('.profile').length) {
     $('#take_snapshot').click(take_snapshot);
 
     function take_snapshot () {
-        console.log('take_snapshot');
-
-        // take snapshot and get image data
         Webcam.snap( function(data_uri) {
-            // display results in page
             $('.profile-images').append("<img class='preloader' src='/static/img/preloader.gif' width='80'/>");
             $('.alert').remove();
             uploadFile(data_uri);
-            // document.getElementById('results').innerHTML =
-            //     '<h2>Here is your image:</h2>' +
-            //     '<img src="'+data_uri+'"/>';
-
-            //$("#my_camera").after("<img class='preloader' src='/static/preloader.gif'/>");
         } );
     };
 
