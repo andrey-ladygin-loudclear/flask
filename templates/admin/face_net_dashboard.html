@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 {% block body %}
     <div class="starter-template face-net bs-docs-container">
-        <div class="bs-callout {% if net.landmarks %}bs-callout-success{% else %}bs-callout-danger{% endif %}">
+        <div class="bs-callout bs-landmark {% if net.landmarks %}bs-callout-success{% else %}bs-callout-danger{% endif %}">
             <h4>Landmark</h4>
             <p>path: {{ net.landmarks_path }}</p>
             {% if net.landmarks %}
@@ -10,10 +10,9 @@
                 <p>No File</p>
             {% endif %}
             <button class="btn btn-info update" data-type="landmarks">Update</button>
-            <img class='preloader' src='/static/img/preloader.gif' width='35'/>
         </div>
 
-        <div class="bs-callout {% if net.lfw %}bs-callout-success{% else %}bs-callout-danger{% endif %}">
+        <div class="bs-callout bs-lfw {% if net.lfw %}bs-callout-success{% else %}bs-callout-danger{% endif %}">
             <h4>LFW</h4>
             {% if net.lfw %}
                 {{ net.lfw }}
@@ -23,7 +22,7 @@
             <button class="btn btn-info update" data-type="lfw">Update</button>
         </div>
 
-        <div class="bs-callout {% if net.output %}bs-callout-success{% else %}bs-callout-danger{% endif %}">
+        <div class="bs-callout bs-callout {% if net.output %}bs-callout-success{% else %}bs-callout-danger{% endif %}">
             <h4>output</h4>
             <p>path: {{ net.output_path }}</p>
             {% if net.output %}

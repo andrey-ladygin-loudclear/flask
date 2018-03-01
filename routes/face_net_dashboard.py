@@ -1,10 +1,11 @@
 import os
 from time import sleep
 
+import eventlet
 from flask import render_template
 from flask_socketio import emit
 
-from app import app, socketio, sio
+from app import app, socketio, sio, mgr
 from acme.auth import Auth, is_logged_in
 from acme.url import URL, absolute
 
@@ -29,22 +30,13 @@ def get_face_net_info():
 
     return net
 
-@sio.on('update')
-async def my_custom_event(arg1, arg2):
-    print('arg1', arg1)
-    print('arg2', arg2)
-    sio.emit('logggged', {'name':123123123})
-    # sio.emit('log', {'name':123123123})
-    return "OK", 123
 
-@sio.on('update old')
-def handle_my_custom_event(arg1, arg2):
-    print(arg1, arg2)
-    emit('logggged', 'tetetetete')
-    return
-    print(json['name'])
-    for i in range(10):
-        #send(json['name'] + ', ' + str(i))
-        emit('log', {'log':i, 'name':json['name']})
-        #emit('log', {'log':i, 'name':json['name']})
-        sleep(1)
+
+@sio.on('update')
+#def handle_my_custom_event(json):
+def handle_my_custom_event(sid, message):
+    print(sid, message)
+    #mgr.emit('my event', data={'foo': 'bar'})
+    for i in range(5):
+        mgr.emit('log', {'log':i, 'message': message['name'] + ': ' + str(i)})
+        eventlet.sleep(1)
