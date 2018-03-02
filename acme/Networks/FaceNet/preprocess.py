@@ -4,18 +4,20 @@ import logging
 import multiprocessing as mp
 import os
 import time
-
+from app import app, APP_PATH, mgr
 import cv2
 
-#from acme.Networks.FaceNet.align_dlib import AlignDlib
-from align_dlib import AlignDlib
+from acme.Networks.FaceNet.align_dlib import AlignDlib
+#from align_dlib import AlignDlib
 
 logger = logging.getLogger(__name__)
 
-align_dlib = AlignDlib(os.path.join(os.path.dirname(__file__), 'shape_predictor_68_face_landmarks.dat'))
+#align_dlib = AlignDlib(os.path.join(os.path.dirname(__file__), 'shape_predictor_68_face_landmarks.dat'))
+if os.path.isfile(os.path.join(APP_PATH, app.config['FACE_NET_LANDMARKS'])):
+    align_dlib = AlignDlib(os.path.join(APP_PATH, app.config['FACE_NET_LANDMARKS']))
 
 
-def main(input_dir, output_dir, crop_dim):
+def preprocess(input_dir, output_dir, crop_dim):
     start_time = time.time()
     pool = mp.Pool(processes=mp.cpu_count())
 
@@ -36,6 +38,7 @@ def main(input_dir, output_dir, crop_dim):
     pool.close()
     pool.join()
     logger.info('Completed in {} seconds'.format(time.time() - start_time))
+    mgr.emit('log-lfw', {'message': 'Completed in {} seconds'.format(time.time() - start_time)}) # move emits to logging
 
 
 def preprocess_image(input_path, output_path, crop_dim):
@@ -92,4 +95,4 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    main(args.input_dir, args.output_dir, args.crop_dim)
+    preprocess(args.input_dir, args.output_dir, args.crop_dim)

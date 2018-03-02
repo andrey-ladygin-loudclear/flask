@@ -1,36 +1,43 @@
 {% extends 'layout.html' %}
 {% block body %}
     <div class="starter-template face-net bs-docs-container">
-        <div class="bs-callout bs-landmark {% if net.landmarks %}bs-callout-success{% else %}bs-callout-danger{% endif %}">
-            <h4>Landmark</h4>
-            <p>path: {{ net.landmarks_path }}</p>
-            {% if net.landmarks %}
-                {{ net.landmarks }}
-            {% else %}
-                <p>No File</p>
-            {% endif %}
-            <button class="btn btn-info update" data-type="landmarks">Update</button>
-        </div>
 
         <div class="bs-callout bs-lfw {% if net.lfw %}bs-callout-success{% else %}bs-callout-danger{% endif %}">
             <h4>LFW</h4>
-            {% if net.lfw %}
-                {{ net.lfw }}
-            {% else %}
-                <p>No Folder</p>
-            {% endif %}
-            <button class="btn btn-info update" data-type="lfw">Update</button>
+            <div class="info">
+                {% if net.lfw %}
+                    <p><b>Size</b>: {{ net.lfw }}</p>
+                {% else %}
+                    <p>No Folder</p>
+                {% endif %}
+            </div>
+            <button class="btn btn-info update" data-type="lfw">Download</button>
         </div>
 
-        <div class="bs-callout bs-callout {% if net.output %}bs-callout-success{% else %}bs-callout-danger{% endif %}">
-            <h4>output</h4>
+        <div class="bs-callout bs-landmark {% if net.landmarks %}bs-callout-success{% else %}bs-callout-danger{% endif %}">
+            <h4>Landmark</h4>
+            <p>path: {{ net.landmarks_path }}</p>
+            <div class="info">
+                {% if net.landmarks %}
+                    <p><b>Size</b>: {{ net.landmarks }}</p>
+                {% else %}
+                    <p>No File</p>
+                {% endif %}
+            </div>
+            <button class="btn btn-info update" data-type="landmarks">Download</button>
+        </div>
+
+        <div class="bs-callout bs-output {% if net.output %}bs-callout-success{% else %}bs-callout-danger{% endif %}">
+            <h4>Preprocessed</h4>
             <p>path: {{ net.output_path }}</p>
-            {% if net.output %}
-                {{ net.output }}
-            {% else %}
-                <p>No Folder</p>
-            {% endif %}
-            <button class="btn btn-info update" data-type="output">Update</button>
+            <div class="info">
+                {% if net.output %}
+                    <p><b>Size</b>: {{ net.output }}</p>
+                {% else %}
+                    <p>No Folder</p>
+                {% endif %}
+            </div>
+            <button class="btn btn-info update" data-type="output">Preprocessing data</button>
         </div>
     </div>
 {% endblock body %}

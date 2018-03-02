@@ -19,14 +19,35 @@ $('.face-net .update').click(function() {
 });
 
 socket.on('log-landmark', function(data) {
-    $('.bs-landmark').find('.logs').append(data.message);
+    $('.bs-landmark').find('.logs').prepend(data.message + "<br/>");
+    console.log(data.message + "<br/>");
 });
 socket.on('log-lfw', function(data) {
-    $('.bs-lfw').find('.logs').append(data.message);
+    $('.bs-lfw').find('.logs').prepend(data.message + "<br/>");
 });
 socket.on('log-callout', function(data) {
-    $('.bs-callout').find('.logs').append(data.message);
+    $('.bs-output').find('.logs').prepend(data.message + "<br/>");
 });
+
+socket.on('finish-landmark', function(data) {
+    finishUpdate($('.bs-landmark'));
+    $('.bs-landmark .info').html(`<p><b>Size:</b> ${data}</p>`);
+});
+socket.on('finish-lfw', function(data) {
+    finishUpdate($('.bs-lfw'));
+    $('.bs-lfw .info').html(`<p><b>Size:</b> ${data}</p>`);
+});
+socket.on('finish-callout', function(data) {
+    finishUpdate($('.bs-output'));
+    $('.bs-output .info').html(`<p><b>Size:</b> ${data}</p>`);
+});
+
+let finishUpdate = function($node) {
+    $node.removeClass('bs-callout-danger')
+        .addClass('bs-callout-success')
+        .find('.logs, .preloader')
+        .remove();
+};
 
 socket.on('disconnect', function() {
     console.info('Socket disconnected');
