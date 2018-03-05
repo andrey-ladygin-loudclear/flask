@@ -44,10 +44,7 @@ def update_request(sid, message):
     if name == 'landmarks': update_landmark()
     if name == 'lfw': update_lfw()
     if name == 'output': update_callout()
-
-    # for i in range(5):
-    #     mgr.emit('log', {'log':i, 'message': message['name'] + ': ' + str(i)})
-    #     eventlet.sleep(1)
+    if name == 'prediction': make_tests()
 
 
 def update_landmark():
@@ -80,6 +77,8 @@ def update_callout():
     size = sizeof_fmt(get_size(output_dir))
     mgr.emit('finish-lfw', size)
 
+def make_tests():
+    pass
 
 def get_size(start_path = '.'):
     total_size = 0
