@@ -1,6 +1,9 @@
 SQLALCHEMY_DATABASE_URI='mysql://username:password@localhost/databasename'
 SQLALCHEMY_TRACK_MODIFICATIONS=True
 FACE_NET_LWF_URL='http://vis-www.cs.umass.edu/lfw/lfw.tgz'
-FACE_NET_LANDMARKS='acme/Networks/FaceNet/shape_predictor_68_face_landmarks.dat'
-FACE_NET_OUTPUT='acme/Networks/FaceNet/output'
-FACE_NET_DATA='acme/Networks/FaceNet/data'
+FACE_NET_LANDMARKS_URL='http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2'
+FACE_NET_LANDMARKS_FILE='acme/Networks/FaceNet/shape_predictor_68_face_landmarks.dat'
+FACE_NET_WEIGHTS_DIR='acme/Networks/FaceNet/weights'
+FACE_NET_WEIGHTS_FILE='acme/Networks/FaceNet/weights/20170511-185253/20170511-185253.pb'
+FACE_NET_OUTPUT_DIR='acme/Networks/FaceNet/output'
+FACE_NET_DATA_DIR='acme/Networks/FaceNet/data'

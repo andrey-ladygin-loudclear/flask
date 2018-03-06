@@ -13,9 +13,8 @@ from acme.Networks.FaceNet.align_dlib import AlignDlib
 logger = logging.getLogger(__name__)
 
 #align_dlib = AlignDlib(os.path.join(os.path.dirname(__file__), 'shape_predictor_68_face_landmarks.dat'))
-if os.path.isfile(os.path.join(APP_PATH, app.config['FACE_NET_LANDMARKS'])):
-    align_dlib = AlignDlib(os.path.join(APP_PATH, app.config['FACE_NET_LANDMARKS']))
-
+if os.path.isfile(os.path.join(APP_PATH, app.config['FACE_NET_LANDMARKS_FILE'])):
+    align_dlib = AlignDlib(os.path.join(APP_PATH, app.config['FACE_NET_LANDMARKS_FILE']))
 
 def preprocess(input_dir, output_dir, crop_dim):
     start_time = time.time()

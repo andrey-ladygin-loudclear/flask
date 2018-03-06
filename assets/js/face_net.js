@@ -18,34 +18,37 @@ $('.face-net .update').click(function() {
     $this.append($logs);
 });
 
-socket.on('log-landmark', function(data) {
-    $('.bs-landmark').find('.logs').prepend(data.message + "<br/>");
-    console.log(data.message + "<br/>");
-});
-socket.on('log-lfw', function(data) {
-    $('.bs-lfw').find('.logs').prepend(data.message + "<br/>");
-});
-socket.on('log-callout', function(data) {
-    $('.bs-output').find('.logs').prepend(data.message + "<br/>");
-});
+const bs = ['landmark', 'lfw', 'output', 'model'];
 
-socket.on('finish-landmark', function(data) {
-    finishUpdate($('.bs-landmark'));
-    $('.bs-landmark .info').html(`<p><b>Size:</b> ${data}</p>`);
-});
-socket.on('finish-lfw', function(data) {
-    finishUpdate($('.bs-lfw'));
-    $('.bs-lfw .info').html(`<p><b>Size:</b> ${data}</p>`);
-});
-socket.on('finish-callout', function(data) {
-    finishUpdate($('.bs-output'));
-    $('.bs-output .info').html(`<p><b>Size:</b> ${data}</p>`);
-});
+for (let i in bs) {
+    socket.on(`log-${bs[i]}`, function(data) {
+        $(`.bs-${bs[i]}`).find('.logs').prepend(data.message + "<br/>");
+    });
+    socket.on(`finish-${bs[i]}`, function(data) {
+        let $node = $(`.bs-${bs[i]}`);
+        $node.find('.info').html('');
+
+        if (data.error) {
+            //$node.find('.info').append('`<p><b>Error:</b> ${data.error}</p>`');
+            $node.find('.logs').append(`<b>Error</b>: ${data.error}`)
+        } else {
+            finishUpdate($node);
+            $node.find('.logs').append("Done! <br/>");
+        }
+
+        if (data.size) {
+            $node.find('.info').append('`<p><b>Size:</b> ${data.size}</p>`');
+        }
+        if (data.message) {
+            $node.find('.info').append('`<p class="alert alert-info"><b>Info:</b> ${data.message}</p>`');
+        }
+    });
+}
 
 let finishUpdate = function($node) {
     $node.removeClass('bs-callout-danger')
         .addClass('bs-callout-success')
-        .find('.logs, .preloader')
+        .find('.preloader')
         .remove();
 };
 

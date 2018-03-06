@@ -15,7 +15,7 @@
         </div>
 
         <div class="bs-callout bs-landmark {% if net.landmarks %}bs-callout-success{% else %}bs-callout-danger{% endif %}">
-            <h4>Landmark</h4>
+            <h4>Weights</h4>
             <p>path: {{ net.landmarks_path }}</p>
             <div class="info">
                 {% if net.landmarks %}
@@ -25,6 +25,19 @@
                 {% endif %}
             </div>
             <button class="btn btn-info update" data-type="landmarks">Download</button>
+        </div>
+
+        <div class="bs-callout bs-model {% if net.model %}bs-callout-success{% else %}bs-callout-danger{% endif %}">
+            <h4>Model</h4>
+            <p>path: {{ net.model_path }}</p>
+            <div class="info">
+                {% if net.model %}
+                    <p><b>Size</b>: {{ net.model }}</p>
+                {% else %}
+                    <p>No File</p>
+                {% endif %}
+            </div>
+            <button class="btn btn-info update" data-type="model">Download</button>
         </div>
 
         <div class="bs-callout bs-output {% if net.output %}bs-callout-success{% else %}bs-callout-danger{% endif %}">

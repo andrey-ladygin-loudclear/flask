@@ -11,29 +11,18 @@ import tensorflow as tf
 from sklearn.svm import SVC
 from tensorflow.python.platform import gfile
 
-from lfw_input import filter_dataset, split_dataset, get_dataset
-
-import lfw_input
-
-from lfw_input import read_image_from_disk
-
-from preprocess import _process_image
+from acme.Networks.FaceNet import lfw_input
+from acme.Networks.FaceNet.lfw_input import get_dataset, read_image_from_disk, split_dataset, filter_dataset
+from acme.Networks.FaceNet.preprocess import _process_image
 
 logger = logging.getLogger(__name__)
 
 
-def main(images, model_path):
-    #image_size=250
-    #crop_dim=180
-
-    #image = _process_image(image, crop_dim)
-    #image = get_image(image, image_size=image_size)
-    #print('Image 12!@', image)
+def get_emmbedings(images, model_path):
 
     start_time = time.time()
     with tf.Session(config=tf.ConfigProto(log_device_placement=False)) as sess:
 
-        #images = [image]
         labels = [['test']]
 
         _load_model(model_filepath=model_path)
@@ -203,7 +192,7 @@ def test():
     images.append(_process_image(im3, crop_dim))
 
     model_path = 'weights/20170511-185253/20170511-185253.pb'
-    embs = main(images=images, model_path=model_path)
+    embs = get_emmbedings(images=images, model_path=model_path)
 
     print(im1, im2, np.linalg.norm(embs[0] - embs[1]))
     print(im1, im3, np.linalg.norm(embs[0] - embs[2]))

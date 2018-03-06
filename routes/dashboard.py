@@ -17,6 +17,7 @@ from io import BytesIO, StringIO
 from os.path import join
 
 #from acme.Networks.FaceNet.preprocess import _process_image
+from acme.Networks.FaceNet.preprocess import _process_image
 from app import app, db, APP_STATIC
 from acme.auth import Auth, is_logged_in
 from acme.url import URL
