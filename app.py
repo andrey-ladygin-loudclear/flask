@@ -37,7 +37,7 @@ sio = socketio.Server(client_manager=mgr)
 from routes.dashboard import *
 from routes.receipt import *
 from routes.user import *
-from routes.face_net_dashboard import *
+#from routes.face_net_dashboard import *
 import commands
 
 if __name__ == "__main__":
@@ -49,4 +49,4 @@ if __name__ == "__main__":
     app = socketio.Middleware(sio, app)
 
     # deploy as an eventlet WSGI server
-    eventlet.wsgi.server(eventlet.listen(('', 8000)), app)
+    eventlet.wsgi.server(eventlet.listen(('127.0.0.1', 8000)), app, debug=True)

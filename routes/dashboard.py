@@ -16,13 +16,12 @@ from io import BytesIO, StringIO
 
 from os.path import join
 
-#from acme.Networks.FaceNet.preprocess import _process_image
 from acme.Networks.FaceNet.preprocess import _process_image
 from app import app, db, APP_STATIC
 from acme.auth import Auth, is_logged_in
 from acme.url import URL
 from models.recipe import Recipe
-from models.user import ProfileImages
+from models.user import ProfileImages, User
 
 
 @app.route('/')
@@ -56,6 +55,32 @@ def login():
     return render_template('auth/login.html')
 
 
+@app.route('/registration', methods=['GET', 'POST'])
+def registration():
+    user_form = {}
+
+    if request.method == 'POST':
+        valid = True
+        first_name = request.form['first_name']
+        last_name = request.form['last_name']
+        email = request.form['email']
+        password = request.form['password']
+        user_form = request.form
+
+        if password != request.form['confirm_password']:
+            valid = False
+            flash('Please confirm your password', 'danger')
+
+        if valid:
+            user = User(first_name=first_name, last_name=last_name, email=email, password=Auth.crypt_password(password))
+            db.session.add(user)
+            db.session.commit()
+            Auth.save(user)
+            return redirect('/')
+
+
+    return render_template('auth/registration.html', user_form=user_form)
+
 @app.route('/logout')
 def logout():
     session.clear()
@@ -76,8 +101,8 @@ def upload_profile_image():
         user = Auth.user()
         img_data = request.form['fileToUpload']
         filename = str(uuid.uuid4()) + '.jpeg'
-        os.makedirs(user.profile_images_dir)
-        path = join(user.profile_images_dir, filename)
+        os.makedirs(user.get_profile_images_dir(), exist_ok=True)
+        path = join(user.get_profile_images_dir(), filename)
         img_data = img_data.replace('data:image/jpeg;base64', '')
         image_bytes = BytesIO(base64.b64decode(img_data))
         image = Image.open(image_bytes)
@@ -89,7 +114,7 @@ def upload_profile_image():
             profile_images = ProfileImages(src=filename, user_id=Auth.user().id)
             db.session.add(profile_images)
             db.session.commit()
-            user_wights = np.load(user.profile_images_weights + '.npy')
+            user_wights = np.load(user.get_profile_images_weights() + '.npy')
             user_wights[profile_images.id] = preprocessed_image
             np.save(user.profile_images_weights, user_wights)
 

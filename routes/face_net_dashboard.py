@@ -11,7 +11,7 @@ from flask_socketio import emit
 import numpy as np
 
 from acme.Networks.FaceNet.download_and_extract_model import download_and_extract_model
-from acme.Networks.FaceNet.preprocess import preprocess, _process_image
+from acme.Networks.FaceNet.preprocess import _process_image, preprocess
 from acme.Networks.FaceNet.test_classifier import get_emmbedings
 from app import app, socketio, sio, mgr
 from acme.auth import Auth, is_logged_in
