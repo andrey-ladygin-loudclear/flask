@@ -16,10 +16,9 @@ from io import BytesIO, StringIO
 
 from os.path import join
 
-from acme.Networks.FaceNet.preprocess import _process_image
-from app import app, db, APP_STATIC
+from app import app, db, APP_STATIC, face_net_instance
 from acme.auth import Auth, is_logged_in
-from acme.url import URL
+from acme.url import URL, resource, static
 from models.recipe import Recipe
 from models.user import ProfileImages, User
 
@@ -42,15 +41,30 @@ def login():
         return redirect('/')
 
     if request.method == 'POST':
+
         email = request.form['email']
-        password = request.form['password']
-        user = Auth.verify(email, password)
 
-        if user:
-            Auth.save(user)
-            return redirect(URL.back())
+        if request.form['face_photo']:
+            img_data = request.form['face_photo']
+            img_data = img_data.replace('data:image/jpeg;base64', '')
+            image_bytes = BytesIO(base64.b64decode(img_data))
+            with tempfile.NamedTemporaryFile(mode="wb") as jpg:
+                jpg.write(image_bytes.getbuffer())
+                preprocessed_image = face_net_instance.process_image(jpg.name, 180)
+                if preprocessed_image is not None:
+                    Auth.verify_by_image(email, preprocessed_image)
+                else:
+                    flash('Please, put your face straight at the webcam!', 'danger')
+        else:
+            password = request.form['password']
+            user = Auth.verify(email, password)
 
-        flash('Wrong email or password', 'danger')
+            if user:
+                Auth.save(user)
+                flash('Hi {} {}'.format(user.first_name, user.last_name), 'success')
+                return redirect(URL.back())
+
+            flash('Wrong email or password', 'danger')
 
     return render_template('auth/login.html')
 
@@ -92,6 +106,7 @@ def logout():
 def profile():
     if request.method == 'POST':
         pass
+    print('AUTH USER', Auth.user())
     return render_template('auth/profile.html', user=Auth.user())
 
 @app.route('/upload_profile_image', methods=['POST'])
@@ -108,19 +123,22 @@ def upload_profile_image():
         image = Image.open(image_bytes)
         image.save(path)
 
-        preprocessed_image = _process_image(path, 180)
+        preprocessed_image = face_net_instance.process_image(path, 180)
 
         if preprocessed_image is not None:
             profile_images = ProfileImages(src=filename, user_id=Auth.user().id)
             db.session.add(profile_images)
             db.session.commit()
-            user_wights = np.load(user.get_profile_images_weights() + '.npy')
-            user_wights[profile_images.id] = preprocessed_image
-            np.save(user.profile_images_weights, user_wights)
+            try:
+                user_wights = np.load(user.get_profile_images_weights() + '.npy')
+                np.append(user_wights, {profile_images.id: preprocessed_image})
+            except FileNotFoundError:
+                user_wights = {profile_images.id: preprocessed_image}
+            np.save(user.get_profile_images_weights(), user_wights)
 
             return json.dumps({
                 'success': True,
-                'path': user.get_resource(filename=filename, static=True)
+                'path': static(path)
             })
     return json.dumps({
         'success': False

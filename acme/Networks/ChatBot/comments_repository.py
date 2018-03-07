@@ -13,11 +13,11 @@ class CommentsRepository:
     def find_existing_score(self, pid):
         self.storage.find_existing_score(pid)
 
-    def replace_comment(self, pid):
-        self.storage.replace_comment(pid)
+    def replace_comment(self, comment_id, parent_id, parent_data, body, subreddit, created_at, score):
+        self.storage.replace_comment(comment_id, parent_id, parent_data, body, subreddit, created_at, score)
 
-    def insert_has_parent(self, pid):
-        self.storage.insert_has_parent(pid)
+    def insert_has_parent(self, comment_id, parent_id, parent_data, body, subreddit, created_at, score):
+        self.storage.insert_has_parent(comment_id, parent_id, parent_data, body, subreddit, created_at, score)
 
-    def insert_no_parent(self, pid):
-        self.storage.insert_no_parent(pid)
+    def insert_no_parent(self, comment_id, parent_id, body, subreddit, created_at, score):
+        self.storage.insert_no_parent(comment_id, parent_id, body, subreddit, created_at, score)

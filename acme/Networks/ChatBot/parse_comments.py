@@ -31,12 +31,12 @@ def parse_comment(file):
             if score >= 2 and acceptable(body):
                 existing_comment_score = repository.find_existing_score(parent_id)
                 if existing_comment_score and score > existing_comment_score:
-                    repository.replace_comment()
+                    repository.replace_comment(comment_id, parent_id, parent_data, body, subreddit, created_at, score)
                 else:
                     if parent_data:
-                        repository.insert_has_parent()
+                        repository.insert_has_parent(comment_id, parent_id, parent_data, body, subreddit, created_at, score)
                     else:
-                        repository.insert_no_parent()
+                        repository.insert_no_parent(comment_id, parent_id, body, subreddit, created_at, score)
 
 
 def format_data(body):

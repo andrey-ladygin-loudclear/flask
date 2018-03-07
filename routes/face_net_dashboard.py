@@ -11,9 +11,8 @@ from flask_socketio import emit
 import numpy as np
 
 from acme.Networks.FaceNet.download_and_extract_model import download_and_extract_model
-from acme.Networks.FaceNet.preprocess import _process_image, preprocess
 from acme.Networks.FaceNet.test_classifier import get_emmbedings
-from app import app, socketio, sio, mgr
+from app import app, socketio, sio, mgr, face_net_instance
 from acme.auth import Auth, is_logged_in
 from acme.url import URL, absolute
 
@@ -115,9 +114,9 @@ def make_tests():
     im3 = '/home/srivoknovski/Python/flask/acme/Networks/FaceNet/data/lfw/Aaron_Tippin/Aaron_Tippin_0001.jpg'
 
     images = []
-    images.append(_process_image(im1, crop_dim))
-    images.append(_process_image(im2, crop_dim))
-    images.append(_process_image(im3, crop_dim))
+    images.append(face_net_instance.process_image(im1, crop_dim))
+    images.append(face_net_instance.process_image(im2, crop_dim))
+    images.append(face_net_instance.process_image(im3, crop_dim))
 
     model_path = absolute(app.config['FACE_NET_WEIGHTS_FILE'])
     embs = get_emmbedings(images=images, model_path=model_path)

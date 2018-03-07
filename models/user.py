@@ -21,10 +21,10 @@ class User(db.Model):
     profile_images = db.relationship('ProfileImages', lazy='dynamic')
 
     def get_profile_images_dir(self):
-        return join(APP_STATIC, 'users', str(self.id), 'images')
+        return join(APP_STATIC, 'resources', 'users', str(self.id), 'images')
 
     def get_profile_images_weights(self):
-        return join(APP_STATIC, 'users', str(self.id))
+        return join(APP_STATIC, 'resources', 'users', str(self.id))
 
     def __eq__(self, other):
         return type(self) is type(other) and self.id == other.id

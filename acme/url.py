@@ -2,7 +2,7 @@ from flask import request
 from flask import session
 from os.path import join
 
-from app import APP_STATIC, APP_URL, APP_PATH
+from app import APP_STATIC, APP_URL, APP_PATH, app
 
 
 class URL:
@@ -26,10 +26,13 @@ class URL:
 
 
 def static(path):
-    return path.replace(APP_PATH, APP_URL, path)
+    return path.replace(APP_PATH, '')
 
 def resource(path):
-    return path.replace(APP_STATIC, APP_URL, path)
+    return path.replace(APP_STATIC, '')
 
 def absolute(path):
     return join(APP_PATH, path)
+
+
+app.add_template_global(static, name='static')

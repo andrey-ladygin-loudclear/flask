@@ -4,6 +4,24 @@ let Webcam = require('./webcam.min');
 
 
 //<!-- Configure a few settings and attach camera -->
+if ($('.login').length) {
+    Webcam.set({
+        width: 320,
+        height: 240,
+        image_format: 'jpeg',
+        jpeg_quality: 90
+    });
+    Webcam.attach( '#my_camera' );
+    $('#take_snapshot').click(function(){
+        console.log('take_snapshot');
+        Webcam.snap( function(data_uri) {
+            $('#face_photo').val(data_uri).closest('form').submit();
+            console.log('submit');
+
+        });
+    });
+
+}
 if ($('.profile').length) {
     Webcam.set({
         width: 320,

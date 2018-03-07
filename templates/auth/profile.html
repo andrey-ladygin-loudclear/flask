@@ -42,7 +42,7 @@
                 </div>
                 <div class="panel-body profile-images">
                     {% for image in user.profile_images %}
-                        <img src="{{ user.get_resource(image.src, static=True) }}" class="img-thumbnail" width="100">
+                        <img src="{{ static(user.get_profile_images_dir()) }}/{{ image.src }}" class="img-thumbnail" width="100">
                     {% endfor %}
                 </div>
             </div>
