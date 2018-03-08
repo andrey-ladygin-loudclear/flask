@@ -27,8 +27,8 @@ def parse_comments():
         'D:\datasets\\2012',
         'D:\datasets\\2013',
     ]
-    for file in folders_with_comments:
-        read_folder(file)
+    for folder in folders_with_comments:
+        read_folder(folder)
 
 def read_folder(dir):
     files = os.listdir(dir)
@@ -36,15 +36,19 @@ def read_folder(dir):
         if not file.endswith('bz2'):
             continue
         archive = os.path.join(dir, file)
-        print('Read Archive', archive)
-        source_file = bz2.BZ2File(archive, "r")
-        parse_comment(source_file, file.replace('.bz2', ''))
+        read_bzfile(archive, file.replace('.bz2', ''))
 
+def read_bzfile(bzfile, name):
+    print('Read Archive', bzfile, 'name', name)
+    source_file = bz2.BZ2File(bzfile, "r")
+    parse_comment(source_file, name)
 
 def parse_comment(file, db_name):
+    check_disk_space()
     total_rows = 0
     parsed_rows = 0
-    repository = CommentsRepository(SQLiteStorage(db_name+'111'))
+    replaced_rows = 0
+    repository = CommentsRepository(SQLiteStorage(db_name))
     repository.create_table()
     for row in file:
         total_rows += 1
@@ -56,12 +60,14 @@ def parse_comment(file, db_name):
         score = row['score']
         subreddit = row['subreddit']
         parent_data = repository.find_parent_comment(parent_id)
-        #print(parent_id. parent_data)
 
         if score >= 2 and acceptable(body):
             existing_comment_score = repository.find_existing_score(parent_id)
-            if existing_comment_score and score > existing_comment_score:
-                repository.replace_comment(comment_id, parent_id, parent_data, body, subreddit, created_at, score)
+
+            if existing_comment_score:
+                if score > existing_comment_score:
+                    repository.replace_comment(comment_id, parent_id, parent_data, body, subreddit, created_at, score)
+                    replaced_rows += 1
             else:
                 if parent_data:
                     repository.insert_has_parent(comment_id, parent_id, parent_data, body, subreddit, created_at, score)
@@ -70,7 +76,7 @@ def parse_comment(file, db_name):
                     repository.insert_no_parent(comment_id, parent_id, body, subreddit, created_at, score)
 
         if total_rows % 100000 == 0:
-            print('Total rows read: {}, Paired rows: {}, Time: {}'.format(total_rows, parsed_rows, str(datetime.now())))
+            print('Total rows read: {}, Paired rows: {}, Replaced rows: {}, Time: {}'.format(total_rows, parsed_rows, replaced_rows, str(datetime.now())))
 
 def format_data(body):
     return body.replace("\n", "<EOF>").replace("\r", "<EOF>").replace('"', "'")
@@ -87,6 +93,19 @@ def acceptable(data, treshold=50):
 
     return True
 
+def sizeof_fmt(num, suffix='B'):
+    for unit in ['','Ki','Mi','Gi','Ti','Pi','Ei','Zi']:
+        if abs(num) < 1024.0:
+            return "%3.1f %s%s" % (num, unit, suffix)
+        num /= 1024.0
+    return "%.1f %s%s" % (num, 'Yi', suffix)
+
+def move_file(file, dest):
+    shutil.move(file, os.path.join(dest, os.path.basename(file)))
+
+def check_disk_space():
+    pass
 
 if __name__ == "__main__":
-    parse_comments()
+    #parse_comments()
+    read_bzfile('/home/srivoknovski/dataset/reddit/RC_2015-01.bz2', 'RC_2015-01')
