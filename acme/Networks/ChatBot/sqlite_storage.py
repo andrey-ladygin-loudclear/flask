@@ -1,11 +1,13 @@
 import sqlite3
 
-timeframe = '2015-05'
-
 class SQLiteStorage():
-    conn = sqlite3.connect('{}.db'.format(timeframe))
-    c = conn.cursor()
+    conn = None
+    c = None
     transactions = []
+
+    def __init__(self, name):
+        self.conn = sqlite3.connect('db2/{}.db'.format(name))
+        self.c = self.conn.cursor()
 
     def create_table(self):
         self.c.execute('''CREATE TABLE IF NOT EXISTS parent_reply
@@ -47,31 +49,40 @@ class SQLiteStorage():
 
     def insert_has_parent(self, comment_id, parent_id, parent_data, body, subreddit, created_at, score):
         try:
-            sql = '''INSERT INTO parent_reply (parent_id, comment_id, parent, comment, subreddit, unix, score);'''.format(
+            sql = '''INSERT INTO parent_reply (parent_id, comment_id, parent, comment, subreddit, unix, score) VALUES ("{parent_id}", "{comment_id}", "{parent}", "{comment}", "{subreddit}", "{unix}", "{score}");'''.format(
                 parent_id, comment_id, parent_data, body, subreddit, created_at, score
             )
             self.transaction_bldr(sql)
         except Exception as e:
-            print('replace_comment', e)
+            print('insert_has_parent', e)
 
     def insert_no_parent(self, comment_id, parent_id, body, subreddit, created_at, score):
         try:
-            sql = '''INSERT INTO parent_reply (parent_id, comment_id, comment, subreddit, unix, score);'''.format(
-                parent_id, comment_id, body, subreddit, created_at, score
+            sql = '''INSERT INTO parent_reply (parent_id, comment_id, comment, subreddit, unix, score) VALUES ("{parent_id}", "{comment_id}", "{comment}", "{subreddit}", "{unix}", "{score}");'''.format(
+                parent_id=parent_id, comment_id=comment_id, comment=body, subreddit=subreddit, unix=created_at, score=score
             )
+
+            # sql = """INSERT INTO parent_reply (parent_id, comment_id, comment, subreddit, unix, score);""".format(
+            #     parent_id, comment_id, body, subreddit, created_at, score
+            # )
             self.transaction_bldr(sql)
         except Exception as e:
-            print('replace_comment', e)
+            pass
+            #print(sql)
+            #print(e)
+           #print('insert_no_parent', e)
 
     def transaction_bldr(self, sql):
         self.transactions.append(sql)
 
         if len(self.transactions) > 1000:
-            self.c.execute("BEGIN TRANSACTION")
+            self.c.execute("BEGIN TRANSACTION;")
+            #print("BEGIN TRANSACTION")
             for s in self.transactions:
                 try:
                     self.c.execute(s)
-                except:
+                except Exception as e:
                     pass
-            self.c.execute("COMMIT;")
+            self.conn.commit()
+            #print("COMMIT", len(self.transactions))
             self.transactions = []
