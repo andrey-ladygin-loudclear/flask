@@ -53,7 +53,7 @@ def FreeSpace(drive):
 
 
 if __name__ == '__main__':
-    drive = r'\\servername\c$'
+    drive = r'C:'
     print(disk_usage(os.getcwd()))
     print('TotalSize of %s = %d' % (drive, TotalSize(drive)))
     print('FreeSapce on %s = %d' % (drive, FreeSpace(drive)))
