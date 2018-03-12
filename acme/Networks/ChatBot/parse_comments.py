@@ -12,6 +12,8 @@ import shutil
 #from acme.Networks.ChatBot.comments_repository import CommentsRepository
 #from acme.Networks.ChatBot.sqlite_storage import SQLiteStorage
 #from acme.Networks.ChatBot.win32_utils import FreeSpace
+from itertools import zip_longest
+from multiprocessing.pool import Pool
 from time import sleep
 
 from comments_repository import CommentsRepository
@@ -39,17 +41,15 @@ def parse_comments():
     for folder in folders_with_comments:
         read_folder(folder)
 
-    start_parse()
 
 def read_folder(dir):
-    global archives
     files = os.listdir(dir)
     for file in files:
         if not file.endswith('bz2'):
             continue
         archive = os.path.join(dir, file)
-        #read_bzfile(archive, file.replace('.bz2', ''))
-        archives.append((archive, file.replace('.bz2', '')))
+        if not db_exists(archive):
+            read_bzfile(archive, file.replace('.bz2', ''))
 
 def read_bzfile(bzfile, name):
     print(threading.current_thread().name, 'Read Archive', bzfile, 'name', name)
@@ -91,15 +91,19 @@ def get_config(filename):
     with open(filename) as f:
         return json.loads(f.read())
 
+def read_lines(file, amount, fillvalue=None):
+    args = [iter(file)] * amount
+    return zip_longest(*args, fillvalue=fillvalue)
 
 def parse_comment(file, db_name):
-    global num_runned_threads
     total_rows = 0
     parsed_rows = 0
     replaced_rows = 0
-    print(threading.current_thread().name, 'Create db', db_name, 'in', db_folder)
+    print('Create db', db_name, 'in', db_folder)
     repository = CommentsRepository(SQLiteStorage(db_name, db_folder=db_folder))
     repository.create_table()
+    with Pool(processes=4) as pool:
+
     for row in file:
         total_rows += 1
         try:
@@ -131,10 +135,9 @@ def parse_comment(file, db_name):
                     repository.insert_no_parent(comment_id, parent_id, body, subreddit, created_at, score)
 
         if total_rows % 500000 == 0:
-            print(threading.current_thread().name, 'File {}, Total rows read: {}, Paired rows: {}, Time: {}'.format(db_name, total_rows, parsed_rows, str(datetime.now())))
+            print('File {}, Total rows read: {}, Paired rows: {}, Time: {}'.format(db_name, total_rows, parsed_rows, str(datetime.now())))
 
-    print(threading.current_thread().name, 'Finish ', db_name)
-    num_runned_threads -= 1
+    print('Finish ', db_name)
 
 def format_data(body):
     return body.replace("\n", "<EOF>").replace("\r", "<EOF>").replace('"', "'")
