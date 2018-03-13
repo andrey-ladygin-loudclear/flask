@@ -41,6 +41,7 @@ def parse_comments():
     for folder in folders_with_comments:
         read_folder(folder)
 
+    start_parse()
 
 def read_folder(dir):
     files = os.listdir(dir)
@@ -48,42 +49,44 @@ def read_folder(dir):
         if not file.endswith('bz2'):
             continue
         archive = os.path.join(dir, file)
-        if not db_exists(archive):
-            read_bzfile(archive, file.replace('.bz2', ''))
+        #read_bzfile(archive, file.replace('.bz2', ''))
+        archives.append((archive, file.replace('.bz2', '')))
 
-def read_bzfile(bzfile, name):
-    print(threading.current_thread().name, 'Read Archive', bzfile, 'name', name)
-    source_file = bz2.BZ2File(bzfile, "r")
-    parse_comment(source_file, name)
+def read_bzfile(item):
+    if not item: return
+
+    bzfile, name = item
+    if not db_exists(name):
+        print(get_process_name(), 'Read Archive', bzfile, 'name', name)
+        source_file = bz2.BZ2File(bzfile, "r")
+        parse_comment(source_file, name)
+
+    return name
 
 def start_parse():
     global archives, num_runned_threads
-    thread_id = 0
+    config = get_config('config.json')
+    total = len(archives)
+    processed = 0
+    all_files = []
 
-    while len(archives) or num_runned_threads:
-        check_disk_space()
-        print('num_runned_threads', num_runned_threads, 'len archives', len(archives))
-        config = get_config('config.json')
-        if num_runned_threads < config['max_threads']:
-            file, name = archives.pop()
-            if not db_exists(name):
-                thread_id += 1
-                num_runned_threads += 1
-                t = threading.Thread(target=read_bzfile, args=(file, name), name='Thread: {}'.format(thread_id))
-                t.start()
-        else:
-            sleep(30)
+    with Pool(processes=config['max_threads']) as pool:
+        for batch_files in iterate_by_batch(archives, config['max_threads'], None):
+            files = pool.map(read_bzfile, batch_files, 1)
+            processed += len(files)
+            print('Processed', files, ',', processed, 'of', total)
+            all_files += files
 
 def db_exists(name):
     if os.path.isfile('C:/db/{}.db'.format(name)):
-        print('File ', name, 'Exists in C:/db/')
+        print(get_process_name(), 'File ', name, 'Exists in C:/db/')
         return True
 
     if os.path.isfile('D:/datasets/db/{}.db'.format(name)):
-        print('File ', name, 'Exists in D:/datasets/db')
+        print(get_process_name(), 'File ', name, 'Exists in D:/datasets/db')
         return True
 
-    print('File', name, 'Doesnt Exists')
+    print(get_process_name(), 'File', name, 'Doesnt Exists')
     return False
 
 
@@ -91,18 +94,19 @@ def get_config(filename):
     with open(filename) as f:
         return json.loads(f.read())
 
-def read_lines(file, amount, fillvalue=None):
-    args = [iter(file)] * amount
+
+def iterate_by_batch(array_list, amount, fillvalue=None):
+    args = [iter(array_list)] * amount
     return zip_longest(*args, fillvalue=fillvalue)
+
 
 def parse_comment(file, db_name):
     total_rows = 0
     parsed_rows = 0
     replaced_rows = 0
-    print('Create db', db_name, 'in', db_folder)
+    print(get_process_name(), 'Create db', db_name, 'in', db_folder)
     repository = CommentsRepository(SQLiteStorage(db_name, db_folder=db_folder))
     repository.create_table()
-    with Pool(processes=4) as pool:
 
     for row in file:
         total_rows += 1
@@ -116,8 +120,8 @@ def parse_comment(file, db_name):
             subreddit = row['subreddit']
             parent_data = repository.find_parent_comment(parent_id)
         except Exception as e:
-            print('Exception', str(e))
-            print(row)
+            print(get_process_name(), 'Exception', str(e))
+            print(get_process_name(), row)
             continue
 
         if score >= 2 and acceptable(body):
@@ -135,9 +139,9 @@ def parse_comment(file, db_name):
                     repository.insert_no_parent(comment_id, parent_id, body, subreddit, created_at, score)
 
         if total_rows % 500000 == 0:
-            print('File {}, Total rows read: {}, Paired rows: {}, Time: {}'.format(db_name, total_rows, parsed_rows, str(datetime.now())))
+            print(get_process_name(), 'File {}, Total rows read: {}, Paired rows: {}, Time: {}'.format(db_name, total_rows, parsed_rows, str(datetime.now())))
 
-    print('Finish ', db_name)
+    print(get_process_name(), 'Finish ', db_name, "Total rows read: {}, Paired rows: {}".format(total_rows, parsed_rows))
 
 def format_data(body):
     return body.replace("\n", "<EOF>").replace("\r", "<EOF>").replace('"', "'")
@@ -171,6 +175,9 @@ def check_disk_space():
         files = os.listdir(db_folder)
         #move_file(os.path.join(db_folder, files[0]), 'D:/datasets/db')
         #print('Move file', files[0], 'to D:/datasets/db')
+
+def get_process_name():
+    return "Process {}".format(os.getpid())
 
 if __name__ == "__main__":
     parse_comments()
