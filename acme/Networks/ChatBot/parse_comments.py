@@ -50,16 +50,18 @@ def read_folder(dir):
             continue
         archive = os.path.join(dir, file)
         #read_bzfile(archive, file.replace('.bz2', ''))
-        archives.append((archive, file.replace('.bz2', '')))
+        name = file.replace('.bz2', '')
+        if not db_exists(name):
+            archives.append((archive, name))
 
 def read_bzfile(item):
     if not item: return
 
     bzfile, name = item
-    if not db_exists(name):
-        print(get_process_name(), 'Read Archive', bzfile, 'name', name)
-        source_file = bz2.BZ2File(bzfile, "r")
-        parse_comment(source_file, name)
+    #if not db_exists(name):
+    print(get_process_name(), 'Read Archive', bzfile, 'name', name)
+    source_file = bz2.BZ2File(bzfile, "r")
+    parse_comment(source_file, name)
 
     return name
 
