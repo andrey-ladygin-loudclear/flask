@@ -8,6 +8,7 @@ class SQLiteStorage():
     transactions = []
 
     def __init__(self, name, db_folder='db'):
+        print('INIT', name, db_folder)
         self.file = '{}/{}.db'.format(db_folder, name)
         self.conn = sqlite3.connect(self.file)
         self.c = self.conn.cursor()
