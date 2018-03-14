@@ -71,6 +71,7 @@ def parse_db_to_file(db):
 
     while cur_length == limit:
         df = repository.get_batch(last_unix, limit)
+        print(df.tail(1))
         last_unix = df.tail(1)['unix'].values[0]
         cur_length = len(df)
 
