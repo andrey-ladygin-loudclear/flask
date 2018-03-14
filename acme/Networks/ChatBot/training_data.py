@@ -71,8 +71,12 @@ def parse_db_to_file(db):
 
     while cur_length == limit:
         df = repository.get_batch(last_unix, limit)
-        print(df.tail(1))
-        last_unix = df.tail(1)['unix'].values[0]
+
+        try:
+            last_unix = df.tail(1)['unix'].values[0]
+        except Exception as e:
+            print('Exception', str(e))
+            raise e
         cur_length = len(df)
 
         write_to_file(from_file, df['parent'].values)
