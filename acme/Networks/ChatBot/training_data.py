@@ -15,8 +15,8 @@ from sqlite_storage import SQLiteStorage
 start = time.time()
 
 tic = lambda start_time=start: 'at %8.4f seconds' % (time.time() - start_time)
-db_folder = 'D:/7     Network/ChatBot/db'
-files_folder = 'D:/7     Network/ChatBot/set'
+db_folder = 'D:\\7     Network\ChatBot\db'
+files_folder = 'D:\\7     Network\ChatBot\set'
 log_file = 'process_thread_log.txt'
 
 def get_databases(dir):
@@ -24,7 +24,7 @@ def get_databases(dir):
     for file in files:
         if not file.endswith('.db'): continue
         if not isfile(join(files_folder, get_db_name(file)+'.from')):
-            yield join(db_folder, file)
+            yield file
         else:
             print(file, 'are exists in', db_folder)
 
@@ -58,9 +58,8 @@ def run_threads(batch):
 def parse_db_to_file(db):
     if not db: return
     start_time = time.time()
-    path = dirname(db)
     name = get_db_name(db)
-    repository = CommentsRepository(SQLiteStorage(name, path))
+    repository = CommentsRepository(SQLiteStorage(name, db_folder))
 
     limit = 15000
     last_unix = 0
