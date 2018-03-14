@@ -17,6 +17,8 @@ start = time.time()
 tic = lambda start_time=start: 'at %8.4f seconds' % (time.time() - start_time)
 db_folder = 'D:\\7     Network\ChatBot\db'
 files_folder = 'D:\\7     Network\ChatBot\set'
+db_folder = 'D:\datasets\db'
+files_folder = 'D:\datasets\db2'
 log_file = 'process_thread_log.txt'
 
 def get_databases(dir):
@@ -71,16 +73,12 @@ def parse_db_to_file(db):
 
     while cur_length == limit:
         df = repository.get_batch(last_unix, limit)
+        cur_length = len(df)
 
         try:
             last_unix = df.tail(1)['unix'].values[0]
-        except Exception:
-            try:
-                last_unix = df.tail(2)['unix'].values[0]
-            except Exception:
-                continue
-
-        cur_length = len(df)
+        except:
+            continue
 
         write_to_file(from_file, df['parent'].values)
         write_to_file(to_file, df['comment'].values)
