@@ -66,7 +66,7 @@ class SQLiteStorage():
             pass
 
     def get_batch(self, unix, limit):
-        print('Select from file', file)
+        print('Select from file', self.file)
         return pd.read_sql("SELECT * FROM parent_reply WHERE unix > {} AND parent NOT NULL AND score > 0 ORDER BY unix ASC LIMIT {}".format(
             unix, limit
         ), self.conn)
