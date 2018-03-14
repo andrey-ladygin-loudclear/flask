@@ -4,10 +4,12 @@ import pandas as pd
 class SQLiteStorage():
     conn = None
     c = None
+    file = None
     transactions = []
 
     def __init__(self, name, db_folder='db'):
-        self.conn = sqlite3.connect('{}/{}.db'.format(db_folder, name))
+        self.file = '{}/{}.db'.format(db_folder, name)
+        self.conn = sqlite3.connect(self.file)
         self.c = self.conn.cursor()
 
     def create_table(self):
@@ -64,6 +66,7 @@ class SQLiteStorage():
             pass
 
     def get_batch(self, unix, limit):
+        print('Select from file', file)
         return pd.read_sql("SELECT * FROM parent_reply WHERE unix > {} AND parent NOT NULL AND score > 0 ORDER BY unix ASC LIMIT {}".format(
             unix, limit
         ), self.conn)

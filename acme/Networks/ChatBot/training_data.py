@@ -98,7 +98,7 @@ def log(*args):
     try:
         with open(log_file, 'a', encoding='utf8') as f:
             for content in args:
-                f.write(content+' ')
+                f.write(str(content)+' ')
             f.write('\n')
     except Exception as e:
         print('ERROR save logs to file', str(e))
