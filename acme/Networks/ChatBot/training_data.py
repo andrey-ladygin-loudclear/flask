@@ -17,8 +17,8 @@ start = time.time()
 tic = lambda start_time=start: 'at %8.4f seconds' % (time.time() - start_time)
 db_folder = 'D:\\7     Network\ChatBot\db'
 files_folder = 'D:\\7     Network\ChatBot\set'
-#db_folder = 'D:\datasets\db'
-#files_folder = 'D:\datasets\db2'
+db_folder = 'D:\datasets\db'
+files_folder = 'C:\set'
 log_file = 'process_thread_log.txt'
 
 def get_databases(dir):
@@ -63,7 +63,7 @@ def parse_db_to_file(db):
     name = get_db_name(db)
     repository = CommentsRepository(SQLiteStorage(name, db_folder))
 
-    limit = 15000
+    limit = 7000
     last_unix = 0
     cur_length = limit
     counter = 0
