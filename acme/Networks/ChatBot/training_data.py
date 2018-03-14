@@ -74,12 +74,12 @@ def parse_db_to_file(db):
 
         try:
             last_unix = df.tail(1)['unix'].values[0]
-        except Exception as e:
-            print('Exception', str(e))
-            print(df)
-            print(df.tail(1))
-            print(df.tail(1)['unix'])
-            raise e
+        except Exception:
+            try:
+                last_unix = df.tail(2)['unix'].values[0]
+            except Exception:
+                continue
+
         cur_length = len(df)
 
         write_to_file(from_file, df['parent'].values)
