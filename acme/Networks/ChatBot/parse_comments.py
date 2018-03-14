@@ -114,7 +114,7 @@ def parse_comment(file, db_name):
         total_rows += 1
         try:
             row = json.loads(row)
-            comment_id = row.get('name', row.get('id'))
+            comment_id = row.get('name', 't1_' + row.get('id'))
             parent_id = row['parent_id']
             body = format_data(row['body'])
             created_at = row['created_utc']
