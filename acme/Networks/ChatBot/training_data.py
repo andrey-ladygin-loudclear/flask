@@ -23,7 +23,7 @@ def get_databases(dir):
     files = os.listdir(dir)
     for file in files:
         if not file.endswith('.db'): continue
-        if not isfile(join(files_folder, basename(file)+'.from')):
+        if not isfile(join(files_folder, get_db_name(file)+'.from')):
             yield file
         else:
             print(file, 'are exists in', db_folder)
@@ -59,7 +59,7 @@ def parse_db_to_file(db):
     if not db: return
     start_time = time.time()
     path = dirname(db)
-    name = basename(db)
+    name = get_db_name(db)
     repository = CommentsRepository(SQLiteStorage(name, path))
 
     limit = 15000
@@ -105,6 +105,9 @@ def log(*args):
 
 def get_name():
     return "Proc {}, {}: ".format(os.getpid(), threading.current_thread().name)
+
+def get_db_name(file):
+    return file.replace('.db', '')
 
 if __name__ == '__main__':
     make_training_set()
