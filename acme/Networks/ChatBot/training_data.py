@@ -17,8 +17,8 @@ start = time.time()
 tic = lambda start_time=start: 'at %8.4f seconds' % (time.time() - start_time)
 db_folder = 'D:\\7     Network\ChatBot\db'
 files_folder = 'D:\\7     Network\ChatBot\set'
-db_folder = 'D:\datasets\db'
-files_folder = 'D:\datasets\db2'
+#db_folder = 'D:\datasets\db'
+#files_folder = 'D:\datasets\db2'
 log_file = 'process_thread_log.txt'
 
 def get_databases(dir):
