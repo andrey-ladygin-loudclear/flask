@@ -24,7 +24,7 @@ def get_databases(dir):
     for file in files:
         if not file.endswith('.db'): continue
         if not isfile(join(files_folder, get_db_name(file)+'.from')):
-            yield file
+            yield join(db_folder, file)
         else:
             print(file, 'are exists in', db_folder)
 
