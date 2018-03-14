@@ -76,6 +76,9 @@ def parse_db_to_file(db):
             last_unix = df.tail(1)['unix'].values[0]
         except Exception as e:
             print('Exception', str(e))
+            print(df)
+            print(df.tail(1))
+            print(df.tail(1)['unix'])
             raise e
         cur_length = len(df)
 
@@ -86,7 +89,7 @@ def parse_db_to_file(db):
         if counter % 100 == 0:
             log(get_name(), 'Proccessing rows', counter*limit, tic(start_time))
 
-    log(get_name(), 'Finish parse', 'rows', counter*limit, tic(start_time), from_file, to_file)
+    log(get_name(), 'Finish parse', 'rows', counter*limit, tic(start_time), name)
 
 def iterate_by_batch(array_list, amount, fillvalue=None):
     args = [iter(array_list)] * amount
