@@ -89,14 +89,17 @@ def parse_db_to_file(db):
 
     log(get_name(), 'Finish parse', 'rows', counter*limit, tic(start_time), name)
 
+
 def iterate_by_batch(array_list, amount, fillvalue=None):
     args = [iter(array_list)] * amount
     return zip_longest(*args, fillvalue=fillvalue)
+
 
 def write_to_file(file, data):
     with open(file, 'a', encoding='utf8') as f:
         for content in data:
             f.write(content+'\n')
+
 
 def log(*args):
     print(*args)
@@ -108,11 +111,14 @@ def log(*args):
     except Exception as e:
         print('ERROR save logs to file', str(e))
 
+
 def get_name():
     return "Proc {}, {}: ".format(os.getpid(), threading.current_thread().name)
 
+
 def get_db_name(file):
     return file.replace('.db', '')
+
 
 if __name__ == '__main__':
     make_training_set()
