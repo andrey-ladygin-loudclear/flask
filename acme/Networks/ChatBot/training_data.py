@@ -11,6 +11,7 @@ import pandas as pd
 
 from comments_repository import CommentsRepository
 from sqlite_storage import SQLiteStorage
+from tqdm import trange, tqdm
 
 start = time.time()
 
@@ -31,31 +32,20 @@ def get_databases(dir):
             print(file, 'are exists in', db_folder)
 
 def make_training_set():
-    number_of_threads_per_proccess = 3
     total = len(os.listdir(db_folder))# hack. Can cause some problems
     number = 0
 
-    per_proccess = iterate_by_batch(get_databases(db_folder), number_of_threads_per_proccess, None)
     start_total_time = time.time()
-    with Pool(processes=os.cpu_count()) as pool:
-        for batch_files in iterate_by_batch(per_proccess, os.cpu_count(), None):
-            start_time = time.time()
-            files = pool.map(run_threads, batch_files, 1)
-            number += len(files)*number_of_threads_per_proccess
-            log("Proccessed", number, 'of', total, 'by', tic(start_time))
-            #processed += len(files)
-            #print('Processed', files, ',', processed, 'of', total)
-            #all_files += files
-    print('Total time execution', tic(start_total_time))
 
-def run_threads(batch):
-    if batch:
-        with dummy_Pool(processes=len(batch)) as pool:
-            start_time = time.time()
-            log(get_name(), 'Run Threads on', batch)
-            threads = pool.map(parse_db_to_file, batch, 1)
-            log(get_name(), 'Finish Threads on', batch, tic(start_time))
-            return threads
+    #with tqdm(total=total) as pbar:
+    with Pool(processes=os.cpu_count()) as pool:
+        start_time = time.time()
+        files = pool.map(parse_db_to_file, get_databases(db_folder), 1)
+        number += len(files)
+        #pbar.update(len(files))
+        log("Proccessed", number, 'of', total, 'by', tic(start_time))
+
+    print('Total time execution', tic(start_total_time))
 
 def parse_db_to_file(db):
     if not db: return
@@ -63,7 +53,7 @@ def parse_db_to_file(db):
     name = get_db_name(db)
     repository = CommentsRepository(SQLiteStorage(name, db_folder))
 
-    limit = 7000
+    limit = 10000
     last_unix = 0
     cur_length = limit
     counter = 0
@@ -113,7 +103,8 @@ def log(*args):
 
 
 def get_name():
-    return "Proc {}, {}: ".format(os.getpid(), threading.current_thread().name)
+    return "Proc {}: ".format(os.getpid())
+    #return "Proc {}, {}: ".format(os.getpid(), threading.current_thread().name)
 
 
 def get_db_name(file):

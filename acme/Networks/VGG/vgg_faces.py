@@ -9,8 +9,8 @@ from acme.Networks.VGG.tensorflow_vgg import vgg16
 from acme.Networks.VGG.tensorflow_vgg import utils
 
 vgg_dir = 'tensorflow_vgg/'
-faces_codes_file = 'faces_codes_2'
-faces_labels_file = 'faces_labels_2'
+faces_codes_file = 'faces_codes'
+faces_labels_file = 'faces_labels'
 
 import os
 
@@ -21,13 +21,11 @@ imw = 96
 imh = 96
 batch_size = 32
 
-# dir = '/home/srivoknovskiy/deepnets/lfw/'
-dir = 'E:\dataset\lfw/'
+dir = '/home/srivoknovski/dataset/lfw'
+#dir = 'E:\dataset\lfw/'
 peoples = list_dir(dir, count_of_images=None, count_of_peoples=None)
 
 def train_nn():
-    check_codes()
-
     vgg_graph = tf.Graph()
     vgg_session = tf.Session(graph=vgg_graph)
 
@@ -50,7 +48,7 @@ def train_nn():
 
     tf.reset_default_graph()
     learning_rate = 0.001
-    epochs = 40
+    epochs = 400
     iteration = 0
 
     fcc_graph = tf.Graph()
@@ -123,8 +121,8 @@ def train_nn():
                     )
                     iteration += 1
 
-                    if iteration % 500 == 0:
-                        check_predictions()
+                    #if iteration % 500 == 0:
+                        #check_predictions()
                     print('')
 
     saver = tf.train.Saver()
@@ -136,50 +134,6 @@ def train_nn():
 
 def get_im(path):
     return dir + path
-
-
-def get_people_codes(peoples):
-    tmp_var=0
-    codes = []
-    labels = []
-
-    with tf.Session() as sess:
-        vgg = vgg16.Vgg16()
-        input_ = tf.placeholder(tf.float32, [None, 224, 224, 3])
-        with tf.name_scope("content_vgg"):
-            vgg.build(input_)
-
-        for somebody_name in peoples:
-            # tmp_var+=1
-            # if tmp_var == 10: break
-
-            print("Starting {} images".format(somebody_name))
-            class_path = dir + somebody_name
-            files = os.listdir(class_path)
-            for ii, file in enumerate(files, 1):
-                # Add images to the current batch
-                # utils.load_image crops the input images for us, from the center
-                img = utils.load_image(os.path.join(class_path, file))
-                #batch.append(img.reshape((1, 224, 224, 3)))
-                feed_dict = {input_: [img]}
-                codes_batch = sess.run(vgg.relu6, feed_dict=feed_dict)
-
-                codes.append(codes_batch[0])
-                labels.append(somebody_name)
-                print(ii, 'of', len(files))
-
-    return codes, labels
-
-def save_codes_and_labels(codes, labels):
-    # write codes to file
-    with open(faces_codes_file, 'w') as f:
-        codes.tofile(f)
-
-    # write labels to file
-    import csv
-    with open(faces_labels_file, 'w') as f:
-        writer = csv.writer(f, delimiter='\n')
-        writer.writerow(labels)
 
 
 def get_codes_and_labels():
@@ -201,15 +155,6 @@ def build_fully_connected_layers(tensor, reuse=False):
         tensor = tf.contrib.layers.fully_connected(tensor, 1024, scope = 'fc1', activation_fn=tf.nn.tanh)
         tensor = tf.contrib.layers.fully_connected(tensor, 128, scope = 'fc2', activation_fn=None)
     return tensor
-
-
-def check_codes():
-    if not isfile(faces_codes_file):
-        codes, labels = get_people_codes(peoples)
-        codes = np.array(codes)
-        print('codes', codes.shape)
-        print('labels', len(labels))
-        save_codes_and_labels(codes, labels)
 
 
 if __name__ == '__main__':

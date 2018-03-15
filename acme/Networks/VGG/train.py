@@ -43,9 +43,9 @@ negative_codes = tf.placeholder(tf.float32, shape=[None, codes.shape[1]], name='
 #negative = build_fully_connected_layers(anchor_codes, reuse=True)
 
 
-anchor = tf.contrib.layers.fully_connected(anchor_codes, 4096, activation_fn=None, scope = 'fc1')
-positive = tf.contrib.layers.fully_connected(positive_codes, 4096, activation_fn=None, scope = 'fc2')
-negative = tf.contrib.layers.fully_connected(negative_codes, 4096, activation_fn=None, scope = 'fc3')
+anchor = tf.contrib.layers.fully_connected(anchor_codes, 1024, activation_fn=None, scope = 'fc1')
+positive = tf.contrib.layers.fully_connected(positive_codes, 1024, activation_fn=None, scope = 'fc2')
+negative = tf.contrib.layers.fully_connected(negative_codes, 1024, activation_fn=None, scope = 'fc3')
 
 loss, positive_dist, negative_dist = triplet_loss([anchor, positive, negative])
 #optimizer = tf.train.AdamOptimizer().minimize(cost)
