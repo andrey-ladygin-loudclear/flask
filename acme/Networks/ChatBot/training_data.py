@@ -16,11 +16,14 @@ from tqdm import trange, tqdm
 start = time.time()
 
 tic = lambda start_time=start: 'at %8.4f seconds' % (time.time() - start_time)
-db_folder = 'D:\\7     Network\ChatBot\db'
-files_folder = 'D:\\7     Network\ChatBot\set'
-#db_folder = 'D:\datasets\db'
-#files_folder = 'C:\set'
+#db_folder = 'D:\\7     Network\ChatBot\db'
+#files_folder = 'D:\\7     Network\ChatBot\set'
+db_folder = 'D:\datasets\db'
+files_folder = 'C:\set'
+
 log_file = 'process_thread_log.txt'
+global_to_file = 'train.to'
+global_from_file = 'train.from'
 
 def get_databases(dir):
     files = os.listdir(dir)
@@ -112,9 +115,44 @@ def get_name():
 def get_db_name(file):
     return file.replace('.db', '')
 
+def concatenate_files():
+    thread1 = threading.Thread(target = parse_from_files, args = ())
+    thread2 = threading.Thread(target = parse_to_files, args = ())
+    thread1.start()
+    thread2.start()
+    thread1.join()
+    thread2.join()
+    print('Finished')
+
+def parse_from_files():
+    with open(global_from_file, 'a', encoding='utf8') as f_from:
+        for file in os.listdir(files_folder):
+            if not file.endswith('.from'): continue
+            file_path = os.path.join(files_folder, file)
+            print('processing', file)
+            with open(file_path, 'r', encoding='utf8') as f:
+                f_from.writelines(f.readlines())
+
+def parse_to_files():
+    with open(global_to_file, 'a', encoding='utf8') as f_to:
+        for file in os.listdir(files_folder):
+            if not file.endswith('.to'): continue
+            file_path = os.path.join(files_folder, file)
+            print('processing', file)
+            with open(file_path, 'r', encoding='utf8') as f:
+                f_to.writelines(f.readlines())
+
 
 if __name__ == '__main__':
-    make_training_set()
+    #make_training_set()
+    #concatenate_files()
+
+    c=0
+    with open(global_to_file, 'r', encoding='utf8') as f_to:
+        for line in f_to.readlines():
+            print(line, end='')
+            c+=1
+            if c > 1000: break
     # t = time.time()
     #
     # f = iterate_by_batch(get_databases(db_folder), 4, None)
