@@ -18,8 +18,8 @@ start = time.time()
 tic = lambda start_time=start: 'at %8.4f seconds' % (time.time() - start_time)
 db_folder = 'D:\\7     Network\ChatBot\db'
 files_folder = 'D:\\7     Network\ChatBot\set'
-db_folder = 'D:\datasets\db'
-files_folder = 'C:\set'
+#db_folder = 'D:\datasets\db'
+#files_folder = 'C:\set'
 log_file = 'process_thread_log.txt'
 
 def get_databases(dir):
@@ -57,6 +57,7 @@ def parse_db_to_file(db):
     last_unix = 0
     cur_length = limit
     counter = 0
+    rows = 0
 
     from_file = join(files_folder, name+'.from')
     to_file = join(files_folder, name+'.to')
@@ -64,6 +65,7 @@ def parse_db_to_file(db):
     while cur_length == limit:
         df = repository.get_batch(last_unix, limit)
         cur_length = len(df)
+        rows += cur_length
 
         try:
             last_unix = df.tail(1)['unix'].values[0]
@@ -75,9 +77,9 @@ def parse_db_to_file(db):
 
         counter += 1
         if counter % 100 == 0:
-            log(get_name(), 'Proccessing rows', counter*limit, tic(start_time))
+            log(get_name(), 'Proccessing rows', rows, tic(start_time))
 
-    log(get_name(), 'Finish parse', 'rows', counter*limit, tic(start_time), name)
+    log(get_name(), 'Finish parse', 'rows', rows, tic(start_time), name)
 
 
 def iterate_by_batch(array_list, amount, fillvalue=None):
