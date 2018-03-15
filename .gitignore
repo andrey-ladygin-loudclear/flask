@@ -5,3 +5,4 @@ config.cfg
 npm-debug.log
 static/app.css
 static/app.js
+__pycache__/
