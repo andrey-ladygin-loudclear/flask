@@ -16,14 +16,14 @@ from tqdm import trange, tqdm
 start = time.time()
 
 tic = lambda start_time=start: 'at %8.4f seconds' % (time.time() - start_time)
-#db_folder = 'D:\\7     Network\ChatBot\db'
-#files_folder = 'D:\\7     Network\ChatBot\set'
-db_folder = 'D:\datasets\db'
-files_folder = 'C:\set'
+db_folder = 'D:\\7     Network\ChatBot\db'
+files_folder = 'D:\\7     Network\ChatBot\set'
+#db_folder = 'D:\datasets\db'
+#files_folder = 'C:\set'
 
 log_file = 'process_thread_log.txt'
-global_to_file = 'train.to'
-global_from_file = 'train.from'
+global_to_file = 'C:\\train.to'
+global_from_file = 'C:\\train.from'
 
 def get_databases(dir):
     files = os.listdir(dir)
@@ -142,22 +142,17 @@ def parse_to_files():
             with open(file_path, 'r', encoding='utf8') as f:
                 f_to.writelines(f.readlines())
 
-
-if __name__ == '__main__':
-    #make_training_set()
-    #concatenate_files()
-
+def cehck():
     c=0
     with open(global_to_file, 'r', encoding='utf8') as f_to:
         for line in f_to.readlines():
             print(line, end='')
             c+=1
             if c > 1000: break
-    # t = time.time()
-    #
-    # f = iterate_by_batch(get_databases(db_folder), 4, None)
-    #
-    # for i in iterate_by_batch(f, 4):
-    #     print(i)
-    #     time.sleep(0.1)
-    # print(tic(t))
+
+
+if __name__ == '__main__':
+    #make_training_set()
+    concatenate_files()
+
+
