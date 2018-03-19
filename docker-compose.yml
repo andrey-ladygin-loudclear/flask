@@ -1,0 +1,23 @@
+# docker-compose.yml
+vendors:
+  image: python:3
+  working_dir: /mnt
+  volumes:
+    - ./:/mnt
+  environment:
+    PYTHONUSERBASE: /mnt/vendor
+  command: pip install -r requirements.txt --user --upgrade
+  #docker-compose run --rm vendors
+
+server:
+  image: python:3
+  working_dir: /mnt
+  volumes:
+    - ./:/mnt
+  ports:
+    - '5000:5000'
+  environment:
+    PYTHONPATH: src
+    PYTHONUSERBASE: /mnt/vendor
+  command: python app.py
+  #docker-compose up server

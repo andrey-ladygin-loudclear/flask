@@ -40,6 +40,8 @@ if __name__ == "__main__":
     app.jinja_env.auto_reload = True
     app.config['TEMPLATES_AUTO_RELOAD'] = True
     #app.run(debug=True, host='127.0.0.1')
+    #socketio_app = SocketIO(app)
+    #socketio_app.run(app)
 
     # wrap Flask application with socketio's middleware
     app = socketio.Middleware(sio, app)
