@@ -4,8 +4,8 @@ from gevent import monkey
 
 from acme.Networks.FaceNet.face_net import FaceNet
 
-monkey.patch_all()
-eventlet.monkey_patch()
+#monkey.patch_all()
+#eventlet.monkey_patch()
 
 from flask import Flask
 import socketio
