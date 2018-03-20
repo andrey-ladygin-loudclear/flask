@@ -40,11 +40,11 @@ if __name__ == "__main__":
     app.jinja_env.auto_reload = True
     app.config['TEMPLATES_AUTO_RELOAD'] = True
     #app.run(debug=True, host='127.0.0.1')
-    #socketio_app = SocketIO(app)
-    #socketio_app.run(app)
+    socketio_app = SocketIO(app, host='127.0.0.1')
+    socketio_app.run(app, host='127.0.0.1', port=8000)
 
     # wrap Flask application with socketio's middleware
-    app = socketio.Middleware(sio, app)
+    #app = socketio.Middleware(sio, app)
 
     # deploy as an eventlet WSGI server
-    eventlet.wsgi.server(eventlet.listen(('', 8000)), app)
+    #eventlet.wsgi.server(eventlet.listen(('', 8000)), app)

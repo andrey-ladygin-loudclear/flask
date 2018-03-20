@@ -56,29 +56,29 @@ socket.on('disconnect', function() {
     console.info('Socket disconnected');
 });
 
-let template = `<div class="bs-callout bs-landmark {% if net.landmarks %}bs-callout-success{% else %}bs-callout-danger{% endif %}">
-            <h4>{{ name }}</h4>
-            <p>path: {{ net.landmarks_path }}</p>
-            <div class="info">
-                {{ info }}
-                {% if net.landmarks %}
-                    <p><b>Size</b>: {{ net.landmarks }}</p>
-                {% else %}
-                    <p>No File</p>
-                {% endif %}
-            </div>
-            <button class="btn btn-info update" data-type="landmarks">Download</button>
-        </div>`;
-
-Vue.component('callout', {
-    template: template,
-    //template: '#counter-template',
-    props: ['subject'],
-    data: function() {
-        return {
-            name: 'Weights',
-            info: `<p><b>Size</b>: ${size}</p>`,
-            count: 0
-        }
-    }
-});
+// let template = `<div class="bs-callout bs-landmark {% if net.landmarks %}bs-callout-success{% else %}bs-callout-danger{% endif %}">
+//             <h4>{{ name }}</h4>
+//             <p>path: {{ net.landmarks_path }}</p>
+//             <div class="info">
+//                 {{ info }}
+//                 {% if net.landmarks %}
+//                     <p><b>Size</b>: {{ net.landmarks }}</p>
+//                 {% else %}
+//                     <p>No File</p>
+//                 {% endif %}
+//             </div>
+//             <button class="btn btn-info update" data-type="landmarks">Download</button>
+//         </div>`;
+// let Vue = require('vue');
+// Vue.component('callout', {
+//     template: template,
+//     //template: '#counter-template',
+//     props: ['subject'],
+//     data: function() {
+//         return {
+//             name: 'Weights',
+//             info: `<p><b>Size</b>: ${size}</p>`,
+//             count: 0
+//         }
+//     }
+// });

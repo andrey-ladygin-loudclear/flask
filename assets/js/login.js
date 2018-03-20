@@ -1,46 +1,46 @@
-let Webcam = require('./webcam.min');
-
-new Vue({
-    el: '#login',
-    data: {
-        points: 500,
-        count: 0,
-        message: ''
-    },
-    methods: {
-        handleIt: function (e) {
-            //e.preventDefault();
-        },
-        doSomething: function () {
-            console.log('clicked');
-            this.count++;
-        }
-    },
-    computed: {
-        skill: function() {
-            if(this.points < 100) {
-                return 'Beginner';
-            }
-
-            return 'Advanced';
-        }
-    },
-    watch: {
-        points: function(points) {
-            console.log(`Points changed up to ${points}`);
-        }
-    },
-    components: {
-        // mycounter: {
-        //     //template: `<h1>Hi </h1>`
-        //     template: '#counter-template',
-        //     props: ['subject'],
-        //     data: function() {
-        //         return { count: 0 }
-        //     }
-        // }
-    }
-});
+// let Webcam = require('./webcam.min');
+// let Vue = require('vue');
+// new Vue({
+//     el: '#login',
+//     data: {
+//         points: 500,
+//         count: 0,
+//         message: ''
+//     },
+//     methods: {
+//         handleIt: function (e) {
+//             //e.preventDefault();
+//         },
+//         doSomething: function () {
+//             console.log('clicked');
+//             this.count++;
+//         }
+//     },
+//     computed: {
+//         skill: function() {
+//             if(this.points < 100) {
+//                 return 'Beginner';
+//             }
+//
+//             return 'Advanced';
+//         }
+//     },
+//     watch: {
+//         points: function(points) {
+//             console.log(`Points changed up to ${points}`);
+//         }
+//     },
+//     components: {
+//         // mycounter: {
+//         //     //template: `<h1>Hi </h1>`
+//         //     template: '#counter-template',
+//         //     props: ['subject'],
+//         //     data: function() {
+//         //         return { count: 0 }
+//         //     }
+//         // }
+//     }
+// });
 //<!-- Configure a few settings and attach camera -->
 if ($('.login').length) {
     Webcam.set({

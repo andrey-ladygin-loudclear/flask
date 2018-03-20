@@ -16,6 +16,7 @@ from io import BytesIO, StringIO
 
 from os.path import join
 
+from acme.utils import get_tmp_image_from_base64, save_image_from_base64
 from app import app, db, APP_STATIC, face_net_instance
 from acme.auth import Auth, is_logged_in
 from acme.url import URL, resource, static
@@ -45,16 +46,12 @@ def login():
         email = request.form['email']
 
         if request.form['face_photo']:
-            img_data = request.form['face_photo']
-            img_data = img_data.replace('data:image/jpeg;base64', '')
-            image_bytes = BytesIO(base64.b64decode(img_data))
-            with tempfile.NamedTemporaryFile(mode="wb") as jpg:
-                jpg.write(image_bytes.getbuffer())
-                preprocessed_image = face_net_instance.process_image(jpg.name, 180)
-                if preprocessed_image is not None:
-                    Auth.verify_by_image(email, preprocessed_image)
-                else:
-                    flash('Please, put your face straight at the webcam!', 'danger')
+            jpg = get_tmp_image_from_base64(request.form['face_photo'])
+            preprocessed_image = face_net_instance.process_image(jpg.name, 180)
+            if preprocessed_image is not None:
+                Auth.verify_by_image(email, preprocessed_image)
+            else:
+                flash('Please, put your face straight at the webcam!', 'danger')
         else:
             password = request.form['password']
             user = Auth.verify(email, password)
@@ -114,16 +111,9 @@ def profile():
 def upload_profile_image():
     if request.method == 'POST':
         user = Auth.user()
-        img_data = request.form['fileToUpload']
-        filename = str(uuid.uuid4()) + '.jpeg'
-        os.makedirs(user.get_profile_images_dir(), exist_ok=True)
-        path = join(user.get_profile_images_dir(), filename)
-        img_data = img_data.replace('data:image/jpeg;base64', '')
-        image_bytes = BytesIO(base64.b64decode(img_data))
-        image = Image.open(image_bytes)
-        image.save(path)
+        image = save_image_from_base64(request.form['fileToUpload'], user.get_profile_images_dir())
 
-        preprocessed_image = face_net_instance.process_image(path, 180)
+        preprocessed_image = face_net_instance.process_image(image.filename, 180)
 
         if preprocessed_image is not None:
             profile_images = ProfileImages(src=filename, user_id=Auth.user().id)
