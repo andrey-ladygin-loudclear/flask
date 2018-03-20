@@ -50,4 +50,15 @@
     </div>
 </div>
     <div id="webcam"></div>
+
+    <script type="text/x-template" id="profile-image-template">
+        <div v-on:profileImage="handleProfileImage"><h2>Profile images</h2>
+            <div v-for="path in images">
+                <img :src="path" class="img-thumbnail"  width="100" />
+            </div>
+            <div class="loader" v-if="loading">
+                <img class='preloader' src='/static/img/preloader.gif' width='80'/>
+            </div>
+        </div>
+    </script>
 {% endblock body %}
