@@ -5,7 +5,7 @@ import os
 import requests
 import zipfile
 
-from app import mgr
+from app import socketio_app
 
 """
 This file is copied from:
@@ -25,11 +25,11 @@ def download_and_extract_model(model_name, data_dir):
     destination = os.path.join(data_dir, model_name + '.zip')
     if not os.path.exists(destination):
         print('Downloading model to %s' % destination)
-        mgr.emit('log-landmark', {'message': 'Downloading model to %s' % destination}) # move emits to logging
+        socketio_app.emit('log-landmark', {'message': 'Downloading model to %s' % destination}) # move emits to logging
         download_file_from_google_drive(file_id, destination)
         with zipfile.ZipFile(destination, 'r') as zip_ref:
             print('Extracting model to %s' % data_dir)
-            mgr.emit('log-landmark', {'message': 'Extracting model to %s' % data_dir}) # move emits to logging
+            socketio_app.emit('log-landmark', {'message': 'Extracting model to %s' % data_dir}) # move emits to logging
             zip_ref.extractall(data_dir)
 
 

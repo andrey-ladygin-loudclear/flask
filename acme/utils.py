@@ -6,6 +6,7 @@ from os import makedirs
 from os.path import join
 
 from PIL import Image
+from flask import request
 
 
 def get_bytes_from_base64_image(base64, image_type='image/jpeg'):
@@ -31,3 +32,18 @@ def save_image_from_base64(base64, path, image_type='image/jpeg'):
     image = Image.open(image_bytes)
     image.save(file_path)
     return image
+
+
+def request_get(name):
+    return request.form.get(name, None)
+
+
+def request_has(name):
+    return name in request.form
+
+
+def request_dict(*args):
+    if len(args):
+        return { arg: request.form.get(arg, None) for arg in args }
+
+    return request.form

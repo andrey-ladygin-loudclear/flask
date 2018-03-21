@@ -1,4 +1,5 @@
 import client from 'socket.io-client';
+import Vue from 'vue';
 
 const preloader = '<img class="preloader" src="/static/img/preloader.gif" width="35">';
 
@@ -13,6 +14,7 @@ $('.face-net .update').click(function() {
     let $this = $(this).parent();
     let $logs = $('<div class="logs well"></div>');
 
+    console.log('emit update', type);
     socket.emit('update', {name: type});
     $this.append($(preloader));
     $this.append($logs);
@@ -82,3 +84,51 @@ socket.on('disconnect', function() {
 //         }
 //     }
 // });
+
+// Vue.component('callout', new Vue({
+//     //el: '#callout',
+//     el: 'callout',
+//     //template: '#callout-template',
+//     delimiters: ['{(', ')}'],
+//     data: {
+//         loading: false,
+//         status: false,
+//         info: 'default',
+//         message: 'adawdaw',
+//     },
+//     // created: function () {
+//     //     console.info('mounted', this.info)
+//     // },
+//     methods: {
+//         update: function() {
+//             console.log('Update', this.info);
+//             this.info += ' 1'
+//         }
+//     }
+// }));
+
+
+Vue.component('callout', {
+    template: '<div><h4>{{title}}</h4><div class="info">{{info}}</div><button v-on:click="update" class="btn btn-info update">Update</button></div>',
+    // template: '#callout-template',
+    // delimiters: ['{(', ')}'],
+    props: ['title'],
+    data() {
+        return {
+            loading: false,
+            info: 'default',
+            counter: 1,
+            message: 'test'
+        }
+    },
+    methods: {
+        update: function() {
+            this.counter += 1;
+            this.message = 'test ' + this.counter;
+        }
+    }
+});
+
+new Vue({
+    el: '#callout-list',
+});

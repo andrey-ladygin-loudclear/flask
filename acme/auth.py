@@ -61,7 +61,6 @@ class Auth:
     def save(user):
         session['logged_in'] = True
         session['user_id'] = user.id
-        Auth.current_user = None
 
     @staticmethod
     def crypt_password(password):
@@ -70,11 +69,7 @@ class Auth:
     @staticmethod
     def user():
         if 'user_id' in session:
-            if Auth.current_user:
-                return Auth.current_user
-
-            Auth.current_user = User.query.filter_by(id=session['user_id']).first()
-            return Auth.current_user
+            return User.query.filter_by(id=session['user_id']).first()
 
         return False
 

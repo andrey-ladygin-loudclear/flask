@@ -2,6 +2,43 @@
 {% block body %}
     <div class="starter-template face-net bs-docs-container">
 
+
+        <div id="callout-list">
+            <callout v-bind:title="99"></callout>
+{#            <callout>#}
+{#                <h4>{( message )} 11111</h4>#}
+{#                <h6 v-if="loading"></h6>#}
+{#                <div class="info">#}
+{#                    {( info )}#}
+{#                </div>#}
+{#                <button class="btn btn-info update" v-on:click="update">Download</button>#}
+{#            </callout>#}
+{#            <callout>#}
+{#                <h4>{( message )} 11111</h4>#}
+{#                <h6 v-if="loading"></h6>#}
+{#                <div class="info">#}
+{#                    {( info )}#}
+{#                </div>#}
+{#                <button class="btn btn-info update" v-on:click="update">Download</button>#}
+{#            </callout>#}
+{#            <callout>#}
+{#                <h4>{( message )} 11111</h4>#}
+{#                <h6 v-if="loading"></h6>#}
+{#                <div class="info">#}
+{#                    {( info )}#}
+{#                </div>#}
+{#                <button class="btn btn-info update" v-on:click="update">Download</button>#}
+{#            </callout>#}
+        </div>
+
+        <template id="callout-template">
+            <div>
+                <h4>{(title)}</h4>
+                <div class="info">{(info)}</div>
+                <button v-on:click="update" class="btn btn-info update">Update</button>
+            </div>
+        </template>
+
         <div class="bs-callout bs-lfw {% if net.lfw %}bs-callout-success{% else %}bs-callout-danger{% endif %}">
             <h4>LFW</h4>
             <div class="info">

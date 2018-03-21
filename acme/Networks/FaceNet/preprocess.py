@@ -4,7 +4,7 @@ import logging
 import multiprocessing as mp
 import os
 import time
-from app import app, APP_PATH, mgr
+from app import app, APP_PATH, socketio_app
 import cv2
 
 from acme.Networks.FaceNet.align_dlib import AlignDlib
@@ -37,7 +37,7 @@ def preprocess(input_dir, output_dir, crop_dim):
     pool.close()
     pool.join()
     logger.info('Completed in {} seconds'.format(time.time() - start_time))
-    mgr.emit('log-lfw', {'message': 'Completed in {} seconds'.format(time.time() - start_time)}) # move emits to logging
+    socketio_app.emit('log-lfw', {'message': 'Completed in {} seconds'.format(time.time() - start_time)}) # move emits to logging
 
 
 def preprocess_image(input_path, output_path, crop_dim):
