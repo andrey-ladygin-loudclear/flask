@@ -3,7 +3,10 @@ from flask_socketio import SocketIO
 
 from acme.Networks.FaceNet.face_net import FaceNet
 
-eventlet.monkey_patch()
+try:
+    eventlet.monkey_patch()
+except Exception as e:
+    print(str(e))
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy

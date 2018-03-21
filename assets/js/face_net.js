@@ -109,26 +109,43 @@ socket.on('disconnect', function() {
 
 
 Vue.component('callout', {
-    template: '<div><h4>{{title}}</h4><div class="info">{{info}}</div><button v-on:click="update" class="btn btn-info update">Update</button></div>',
-    // template: '#callout-template',
-    // delimiters: ['{(', ')}'],
-    props: ['title'],
+    template: '#callout-template',
+    delimiters: ['{(', ')}'],
+    props: ['callout'],
     data() {
+        //console.log('this.props.collout.type', this.props.collout.type);
         return {
             loading: false,
             info: 'default',
             counter: 1,
-            message: 'test'
+            logs: ''
         }
     },
+    // created: function() {
+    //     console.log('mounted mounted mounted');
+    //     const type = this.props.collout.type;
+    //     socket.on(`log-${type}`, (data) => {
+    //         this.logs += data.message + "<br/>";
+    //     });
+    // },
     methods: {
         update: function() {
-            this.counter += 1;
-            this.message = 'test ' + this.counter;
+            const type = this.props.collout.type;
+            socket.emit('update', {name: type});
+            this.loading = true;
         }
     }
 });
 
 new Vue({
     el: '#callout-list',
+    data: {
+        callouts: [
+            {title:"LFW", type:"lfw"},
+            {title:"Weights", type:"landmarks"},
+            {title:"Model", type:"model"},
+            {title:"Preprocessed", type:"output"},
+            {title:"Prediction", type:"prediction"},
+        ]
+    }
 });

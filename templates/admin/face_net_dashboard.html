@@ -4,38 +4,16 @@
 
 
         <div id="callout-list">
-            <callout v-bind:title="99"></callout>
-{#            <callout>#}
-{#                <h4>{( message )} 11111</h4>#}
-{#                <h6 v-if="loading"></h6>#}
-{#                <div class="info">#}
-{#                    {( info )}#}
-{#                </div>#}
-{#                <button class="btn btn-info update" v-on:click="update">Download</button>#}
-{#            </callout>#}
-{#            <callout>#}
-{#                <h4>{( message )} 11111</h4>#}
-{#                <h6 v-if="loading"></h6>#}
-{#                <div class="info">#}
-{#                    {( info )}#}
-{#                </div>#}
-{#                <button class="btn btn-info update" v-on:click="update">Download</button>#}
-{#            </callout>#}
-{#            <callout>#}
-{#                <h4>{( message )} 11111</h4>#}
-{#                <h6 v-if="loading"></h6>#}
-{#                <div class="info">#}
-{#                    {( info )}#}
-{#                </div>#}
-{#                <button class="btn btn-info update" v-on:click="update">Download</button>#}
-{#            </callout>#}
+            <callout v-for="callout in callouts" :key="callout.title" :callout="callout"></callout>
         </div>
 
         <template id="callout-template">
             <div>
-                <h4>{(title)}</h4>
+                <h4>{(callout.title)}</h4>
                 <div class="info">{(info)}</div>
-                <button v-on:click="update" class="btn btn-info update">Update</button>
+                <img v-if="loading" class="preloader" src="/static/img/preloader.gif" width="35">
+                <div v-if="loading" class="logs well">{(logs)}</div>
+                <button v-on:click="update" class="btn btn-info">Update</button>
             </div>
         </template>
 
