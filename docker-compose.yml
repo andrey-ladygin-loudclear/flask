@@ -1,26 +1,28 @@
 # docker-compose.yml
 vendors:
-  image: fix_python2 #fix_python # - for cmake (dlib)
-  working_dir: /mnt
-  volumes:
-    - ./:/mnt
-  environment:
-    PYTHONUSERBASE: /mnt/vendor
-  command: pip install -r requirements.txt --user --upgrade
-  #docker-compose run --rm vendors
+    image: fix_python2 #fix_python # - for cmake (dlib)
+    working_dir: /mnt
+    volumes:
+      - ./:/mnt
+    environment:
+      PYTHONUSERBASE: /mnt/vendor
+    command: pip install -r requirements.txt --user --upgrade
+    #docker-compose run --rm vendors
 
 server:
-  image: fix_python2
-  working_dir: /mnt
-  volumes:
-    - ./:/mnt
-  ports:
-    - '8000:8000'
-  environment:
-    PYTHONPATH: src
-    PYTHONUSERBASE: /mnt/vendor
-  command: python app.py
-  #docker-compose up server
+    image: fix_python2
+    working_dir: /mnt
+    volumes:
+      - ./:/mnt
+    ports:
+      - '8000:8000'
+    links:
+      - mysql
+    environment:
+      PYTHONPATH: src
+      PYTHONUSERBASE: /mnt/vendor
+    command: python app.py
+    #docker-compose up server
 
 mysql:
     image: mysql
