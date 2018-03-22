@@ -21,6 +21,8 @@ app.secret_key = 'OUGAWD8T2yi3e2l39W^&*(D(%'
 app.config.from_pyfile('config.cfg')
 db = SQLAlchemy(app)
 
+#app.session_interface = RedisSessionInterface()
+
 #mgr = socketio.KombuManager('redis://', write_only=True)
 #sio = socketio.Server(client_manager=mgr)
 socketio_app = SocketIO(app, message_queue='redis://')

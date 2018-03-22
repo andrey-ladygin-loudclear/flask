@@ -33,3 +33,24 @@ mysql:
       MYSQL_ALLOW_EMPTY_PASSWORD: 1
     #volumes:
     #  - /var/lib/mysql:/var/lib/mysql
+
+pyapp:
+    build: .
+    ports:
+      - 7000
+
+loadbalancer:
+    image: 'dockercloud/haproxy:latest'
+    links:
+      - pyapp
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 80:80
+    #environment:
+    #  VIRTUAL_HOST: 'localhost:7000'
+    #docker-compose up -d
+    #docker-compose scale pyapp=5
+    # docker-compose stop loadbalancer
+    # docker-compose rm loadbalancer
+    # docker-compose up -d --no-deps loadbalancer
