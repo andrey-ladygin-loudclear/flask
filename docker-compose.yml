@@ -32,7 +32,7 @@ mysql:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: flask
       MYSQL_USER: root
-      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+      MYSQL_ALLOW_EMPTY_PASSWORD: yes
     #volumes:
     #  - /var/lib/mysql:/var/lib/mysql
 
@@ -56,3 +56,31 @@ loadbalancer:
     # docker-compose stop loadbalancer
     # docker-compose rm loadbalancer
     # docker-compose up -d --no-deps loadbalancer
+
+mysql-master:
+    image: 'bitnami/mysql:latest'
+    ports:
+      - '3306'
+    volumes:
+      - /path/to/mysql-persistence:/bitnami
+    environment:
+      - MYSQL_REPLICATION_MODE=master
+      - MYSQL_REPLICATION_USER=repl_user
+      - MYSQL_REPLICATION_PASSWORD=repl_password
+      - MYSQL_ROOT_PASSWORD=master_root_password
+      - MYSQL_USER=my_user
+      - MYSQL_PASSWORD=my_password
+      - MYSQL_DATABASE=my_database
+  mysql-slave:
+    image: 'bitnami/mysql:latest'
+    ports:
+      - '3306'
+    depends_on:
+      - mysql-master
+    environment:
+      - MYSQL_REPLICATION_MODE=slave
+      - MYSQL_REPLICATION_USER=repl_user
+      - MYSQL_REPLICATION_PASSWORD=repl_password
+      - MYSQL_MASTER_HOST=mysql-master
+      - MYSQL_MASTER_PORT_NUMBER=3306
+      - MYSQL_MASTER_ROOT_PASSWORD=master_root_password
