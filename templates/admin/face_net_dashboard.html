@@ -1,76 +1,18 @@
 {% extends 'layout.html' %}
 {% block body %}
-    <div class="starter-template face-net bs-docs-container">
 
-
-        <div id="callout-list">
-            <callout v-for="callout in callouts" :key="callout.title" :callout="callout"></callout>
-        </div>
-
-        <template id="callout-template">
-            <div>
-                <h4>{(callout.title)}</h4>
-                <div class="info">{(info)}</div>
-                <img v-if="loading" class="preloader" src="/static/img/preloader.gif" width="35">
-                <div v-if="loading" class="logs well">{(logs)}</div>
-                <button v-on:click="update" class="btn btn-info">Update</button>
-            </div>
-        </template>
-
-        <div class="bs-callout bs-lfw {% if net.lfw %}bs-callout-success{% else %}bs-callout-danger{% endif %}">
-            <h4>LFW</h4>
-            <div class="info">
-                {% if net.lfw %}
-                    <p><b>Size</b>: {{ net.lfw }}</p>
-                {% else %}
-                    <p>No Folder</p>
-                {% endif %}
-            </div>
-            <button class="btn btn-info update" data-type="lfw">Download</button>
-        </div>
-
-        <div class="bs-callout bs-landmark {% if net.landmarks %}bs-callout-success{% else %}bs-callout-danger{% endif %}">
-            <h4>Weights</h4>
-            <p>path: {{ net.landmarks_path }}</p>
-            <div class="info">
-                {% if net.landmarks %}
-                    <p><b>Size</b>: {{ net.landmarks }}</p>
-                {% else %}
-                    <p>No File</p>
-                {% endif %}
-            </div>
-            <button class="btn btn-info update" data-type="landmarks">Download</button>
-        </div>
-
-        <div class="bs-callout bs-model {% if net.model %}bs-callout-success{% else %}bs-callout-danger{% endif %}">
-            <h4>Model</h4>
-            <p>path: {{ net.model_path }}</p>
-            <div class="info">
-                {% if net.model %}
-                    <p><b>Size</b>: {{ net.model }}</p>
-                {% else %}
-                    <p>No File</p>
-                {% endif %}
-            </div>
-            <button class="btn btn-info update" data-type="model">Download</button>
-        </div>
-
-        <div class="bs-callout bs-output {% if net.output %}bs-callout-success{% else %}bs-callout-danger{% endif %}">
-            <h4>Preprocessed</h4>
-            <p>path: {{ net.output_path }}</p>
-            <div class="info">
-                {% if net.output %}
-                    <p><b>Size</b>: {{ net.output }}</p>
-                {% else %}
-                    <p>No Folder</p>
-                {% endif %}
-            </div>
-            <button class="btn btn-info update" data-type="output">Preprocessing data</button>
-        </div>
-
-        <div class="bs-callout bs-output bs-callout-success">
-            <h4>Prediction</h4>
-            <button class="btn btn-info update" data-type="prediction">Make Tests</button>
-        </div>
+    <div id="callout-list" class="starter-template face-net bs-docs-container">
+        <callout v-for="callout in callouts" :key="callout.title" :callout="callout"></callout>
     </div>
+
+    <template id="callout-template">
+        <div class="bs-callout bs-lfw" v-bind:class="[ success ? 'bs-callout-success' : 'bs-callout-danger' ]">
+            <h4>{(callout.title)}</h4>
+            <div class="info" v-html="info">{(info)}</div>
+            <div v-if="showLogs" class="logs well" v-html="logs">{(logs)}</div>
+            <button v-on:click="update" class="btn btn-info">Update</button>
+            <img v-if="loading" class="preloader" src="/static/img/preloader.gif" width="35">
+        </div>
+    </template>
+
 {% endblock body %}
