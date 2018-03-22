@@ -39,7 +39,6 @@ def check_request(message):
 
     except Exception as e:
         socketio_app.emit('finish-' + str(name), {'error': "{}: {}".format(type(e).__name__, str(e))})
-        raise e
 
 
 @socketio_app.on('update')
@@ -55,7 +54,6 @@ def update_request(message):
         if name == 'prediction': make_tests()
     except Exception as e:
         socketio_app.emit('finish-' + str(name), {'error': "{}: {}".format(type(e).__name__, str(e))})
-        raise e
 
 
 def update_model():

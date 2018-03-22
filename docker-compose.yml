@@ -1,6 +1,6 @@
 # docker-compose.yml
 vendors:
-  image: python:3
+  image: fix_python2 #fix_python # - for cmake (dlib)
   working_dir: /mnt
   volumes:
     - ./:/mnt
@@ -10,14 +10,26 @@ vendors:
   #docker-compose run --rm vendors
 
 server:
-  image: python:3
+  image: fix_python2
   working_dir: /mnt
   volumes:
     - ./:/mnt
   ports:
-    - '5000:5000'
+    - '8000:8000'
   environment:
     PYTHONPATH: src
     PYTHONUSERBASE: /mnt/vendor
   command: python app.py
   #docker-compose up server
+
+mysql:
+    image: mysql
+    ports:
+      - 6603:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: flask
+      MYSQL_USER: root
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+    #volumes:
+    #  - /var/lib/mysql:/var/lib/mysql
