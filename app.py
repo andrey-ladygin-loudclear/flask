@@ -1,6 +1,7 @@
+import logging
+from tempfile import mkdtemp
 import eventlet
 from flask_socketio import SocketIO
-
 from acme.Networks.FaceNet.face_net import FaceNet
 
 try:
@@ -17,15 +18,19 @@ APP_STATIC = join(APP_PATH, 'static')
 APP_URL = '/'
 
 app = Flask(__name__)
-app.secret_key = 'OUGAWD8T2yi3e2l39W^&*(D(%'
+app.secret_key = 'OW^U8(DT2yi3e(GAWD2l39&*%'
 app.config.from_pyfile('config.cfg')
 db = SQLAlchemy(app)
+logging.getLogger().setLevel(logging.INFO)
 
-#app.session_interface = RedisSessionInterface()
 
-#mgr = socketio.KombuManager('redis://', write_only=True)
+app.config["SESSION_TYPE"] = "filesystem"
+app.config["SESSION_PERMANENT"] = False
+app.config["SESSION_FILE_DIR"] = mkdtemp()
+
+#mgr = socketio.KombuManager('redis://172.96.50.3', write_only=True)
 #sio = socketio.Server(client_manager=mgr)
-socketio_app = SocketIO(app, message_queue='redis://')
+socketio_app = SocketIO(app, message_queue='redis://172.96.50.3')
 
 face_net_instance = FaceNet()
 if isfile(join(APP_PATH, app.config['FACE_NET_LANDMARKS_FILE'])):
@@ -45,7 +50,7 @@ if __name__ == "__main__":
     #app.run(debug=True, host='127.0.0.1')
 
     #run application with flask_socketio
-    socketio_app.run(app, host='127.0.0.1', port=8000)
+    socketio_app.run(app, host='0.0.0.0', port=8000)#0.0.0.0 for docker binding
 
     # wrap Flask application with socketio's middleware
     #app = socketio.Middleware(sio, app)

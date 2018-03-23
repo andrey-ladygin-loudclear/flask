@@ -42,8 +42,8 @@ def request_has(name):
     return name in request.form
 
 
-def request_dict(*args):
+def request_dict(*args, default=None):
     if len(args):
-        return { arg: request.form.get(arg, None) for arg in args }
+        return { arg: request.form.get(arg, default) for arg in args }
 
     return request.form
