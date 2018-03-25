@@ -115,6 +115,7 @@ def profile():
 def upload_profile_image():
     if request.method == 'POST':
         user = Auth.user()
+
         image = save_image_from_base64(request.form['fileToUpload'], user.get_profile_images_dir())
 
         preprocessed_image = face_net_instance.process_image(image.filename, 180)

@@ -1,10 +1,10 @@
 import socket
 
-from flask import render_template
+import boto3
+from flask import render_template, session
 
-from app import app
+from app import app, s3
 from models.recipe import Recipe
-
 
 @app.route('/')
 @app.route('/<int:page>',methods=['GET'])
@@ -16,4 +16,4 @@ def dashboard(page=1):
 
 @app.route("/healthcheck")
 def index():
-    return "Hello from FLASK. My Hostname is: %s \n" % (socket.gethostname())
+    return "Hello 123 from FLASK. My Hostname is: %s\n" % (socket.gethostname())

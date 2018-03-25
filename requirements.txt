@@ -20,3 +20,5 @@ Pillow
 requests
 faker
 mysqlclient
+boto3
+Flask-Session
