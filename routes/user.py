@@ -74,8 +74,6 @@ def registration():
         except Exception as e:
             flash(str(e), 'danger')
 
-
-
     return render_template('auth/registration.html', user_form=user_form)
 
 
@@ -121,7 +119,7 @@ def upload_profile_image():
         preprocessed_image = face_net_instance.process_image(image.filename, 180)
 
         if preprocessed_image is not None:
-            profile_images = ProfileImages(src=filename, user_id=Auth.user().id)
+            profile_images = ProfileImages(src=image.filename, user_id=Auth.user().id)
             db.session.add(profile_images)
             db.session.commit()
             try:
@@ -133,7 +131,7 @@ def upload_profile_image():
 
             return json.dumps({
                 'success': True,
-                'path': url_for('static', filename=filename)
+                'path': url_for('static', filename=image.filename)
             })
     return json.dumps({
         'success': False

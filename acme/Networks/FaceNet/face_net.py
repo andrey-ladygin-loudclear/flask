@@ -12,6 +12,7 @@ from acme.Networks.FaceNet.align_dlib import AlignDlib
 
 logger = logging.getLogger(__name__)
 
+
 class FaceNet:
     align_dlib = None
 
@@ -44,7 +45,6 @@ class FaceNet:
         pool.join()
         logger.info('Completed in {} seconds'.format(time.time() - start_time))
 
-
     def preprocess_image(self, input_path, output_path, crop_dim):
         """
         Detect face, align and crop :param input_path. Write output to :param output_path
@@ -59,11 +59,7 @@ class FaceNet:
         else:
             logger.warning("Skipping filename: {}".format(input_path))
 
-
     def process_image(self, filename, crop_dim):
-        image = None
-        aligned_image = None
-
         image = self._buffer_image(filename)
 
         if image is not None:
@@ -73,13 +69,11 @@ class FaceNet:
 
         return aligned_image
 
-
     def _buffer_image(self, filename):
         logger.debug('Reading image: {}'.format(filename))
         image = cv2.imread(filename, )
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         return image
-
 
     def _align_image(self, image, crop_dim):
         bb = self.align_dlib.getLargestFaceBoundingBox(image)
@@ -87,7 +81,6 @@ class FaceNet:
         if aligned is not None:
             aligned = cv2.cvtColor(aligned, cv2.COLOR_BGR2RGB)
         return aligned
-
 
     def get_emmbedings(self, images, model_path):
 
@@ -105,7 +98,6 @@ class FaceNet:
             threads = tf.train.start_queue_runners(coord=coord, sess=sess)
 
             return sess.run(embedding_layer, feed_dict={images_placeholder: images, phase_train_placeholder: False})
-
 
     def _load_model(self, model_filepath):
         """

@@ -73,7 +73,7 @@ services:
         flask-app-network:
           ipv4_address: 172.96.50.10
       # docker-compose up -d
-      # docker-compose scale pyapp=5
+      # docker-compose scale server=5
       # docker-compose stop loadbalancer
       # docker-compose rm loadbalancer
       # docker-compose up -d --no-deps loadbalancer
